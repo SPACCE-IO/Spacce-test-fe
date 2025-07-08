@@ -7,7 +7,7 @@ export default function EndSectionGradient({
 }>){
     return (
         <section
-        className="h-[130vh] relative flex pt-[200px] px-8 text-white bg-gradient-custom-bottom">
+        className="h-[100vh] relative flex pt-[200px] px-8 text-white bg-gradient-custom-bottom">
             {children}
         </section>
     );

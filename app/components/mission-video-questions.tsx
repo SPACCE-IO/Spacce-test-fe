@@ -18,7 +18,7 @@ interface MissionVideoQuestionsProps {
 
 const MissionVideoQuestions = ({
   questions,
-  // onSubmit,
+  onSubmit,
 }: MissionVideoQuestionsProps) => {
   const [activeQuestionId, setActiveQuestionId] = useState<number | null>(null);
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});
@@ -56,6 +56,14 @@ const MissionVideoQuestions = ({
       [questionId]: value,
     }));
   };
+
+  const handleSubmit = () => {
+    const filteredAnswers = Object.fromEntries(
+      Object.entries(answers).filter(([_, answer]) => answer.trim() !== "")
+    );
+    console.log("Submitted answers:", filteredAnswers);
+    onSubmit(filteredAnswers);
+  }
 
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
@@ -255,6 +263,15 @@ const MissionVideoQuestions = ({
           </div>
         </div>
       </div>
+      <div className="flex justify-center mt-8">
+              <Button onClick={handleSubmit} 
+              variant={"default"}
+              className="w-[250px] h-[50px] flex items-center justify-center gap-2 bg-[#36CEF8]"
+                    
+              >
+                Submit <Mouse />
+              </Button>
+            </div>
     </section>
   );
 };

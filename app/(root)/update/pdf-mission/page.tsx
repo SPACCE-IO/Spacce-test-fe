@@ -53,6 +53,7 @@ const MissionPdf = () => {
 
   const handleMissionSubmit = (answers: { [key: number]: string }) => {
     console.log("Submitted answers:", answers);
+    router.push("/congratulation");
     // Handle the submission logic here
   };
 
@@ -267,7 +268,7 @@ const MissionPdf = () => {
             onSubmit={handleMissionSubmit}
           />
         </div>
-        <div ref={section5Ref} className="snap-end">
+        {/* <div ref={section5Ref} className="snap-end">
           <EndSectionGradient>
             <div className=" container mx-auto flex flex-col items-center justify-center gap-10 ">
               <MissionBadge mission="poster" missionStatus="complete" />
@@ -289,7 +290,7 @@ const MissionPdf = () => {
               </div>
             </div>
           </EndSectionGradient>
-        </div>
+        </div> */}
       </div>
     </div>
   );
