@@ -13,6 +13,7 @@ const TaskPaginationSection: React.FC<TaskPaginationSectionProps> = ({
   currentStep,
   children
 }) => {
+  console.log("TaskPaginationSection rendered with title:", title, "totalSteps:", totalSteps, "currentStep:", currentStep);
   return (
     <div className="right-0 z-10 fixed h-screen w-[122px] pt-10 pb-[60px] pr-[32px] bg-center bg-no-repeat bg-fixed bg-opacity-50">
       <p
@@ -51,7 +52,7 @@ const TaskPaginationSection: React.FC<TaskPaginationSectionProps> = ({
       </div>
           {
             currentStep!== undefined &&
-              currentStep > 1 && <div className="absolute z-30 bottom-10 right-10">
+              currentStep > 2 && <div className="absolute z-30 bottom-10 right-10">
               {children}
               </div>
             

@@ -37,7 +37,7 @@ const MissionPdf = () => {
     {
       id: 2,
       question:
-        "What has been their most significant achievement or proudest moment at the company?",
+      "What has been their most significant achievement or proudest moment at the company?",
       answer: "",
       type: "longText" as const,
       hint: "Think about specific projects, initiatives, or milestones they've accomplished",
@@ -257,7 +257,8 @@ const MissionPdf = () => {
           <MissionInstruction
             missionName=""
             title=""
-            missionInstruction="Approach a colleague who has been in a company for longer than 5 years and find out more about their career and journey at the company."
+            missionInstruction="Have a look at the infographic / pdf to get a better idea on how to submit your tested concept. Your task today is to schedule time in your diary over the next 6 months to work on this. Please schedule a minimum of 2 hours a month. This msision is your initaition into our curious club. Get ready to innovate, learn and grow"
+            handleButtonScroll={() => handleButtonScroll(section4Ref)}
           />
         </div>
         <div ref={section4Ref} className="snap-start h-screen">
