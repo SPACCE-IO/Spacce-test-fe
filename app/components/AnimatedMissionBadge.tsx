@@ -54,6 +54,7 @@ const AnimatedMissionBadge: React.FC<AnimatedMissionBadgeProps> = ({
       },
     })
 
+    // CHANGED: Modified to move to top-left instead of bottom-right
     tl1.fromTo(
       badge,
       {
@@ -64,9 +65,11 @@ const AnimatedMissionBadge: React.FC<AnimatedMissionBadgeProps> = ({
         left: "50%",
       },
       {
-        x: "calc(100vw - 120px)",
-        y: "calc(100vh - 120px)",
-        scale: 0.2,
+        x: "-50%", // Keep centered horizontally, then we'll adjust
+        y: "-50%", // Keep centered vertically, then we'll adjust
+        scale: 0.3,
+        top: "80px", // Move to top (80px from top)
+        left: "80px", // Move to left (80px from left)
       },
     )
 
@@ -81,15 +84,21 @@ const AnimatedMissionBadge: React.FC<AnimatedMissionBadgeProps> = ({
       },
     })
 
+    // Move badge to left side of section2, roughly where the text would be
     tl2.to(badge, {
-      y: "15vh", // Move to the top right
-      x: `${(section2.offsetWidth - badge.offsetWidth) / 2.2}px`,
-      // x: "35vw",
+      y: "-50%", // Keep transform centered
+      x: "-50%", // Keep transform centered
+      top: "25%", // Move up a bit more
+      left: "25%", // Move a bit to the right
       ease: "none",
     })
-
+    
     tl2.to(badge, {
-      y: "-200%", // Move to the top right
+      y: "-50%", // Keep transform centered
+      x: "-50%", // Keep transform centered
+      top: "-10%", // Move up and off screen with the page
+      left: "25%", // Keep same horizontal position
+      opacity: 0, // Fade out as it moves up
       ease: "none",
     })
 
@@ -107,4 +116,3 @@ const AnimatedMissionBadge: React.FC<AnimatedMissionBadgeProps> = ({
 }
 
 export default AnimatedMissionBadge
-
