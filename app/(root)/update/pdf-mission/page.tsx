@@ -22,8 +22,8 @@ const MissionPdf = () => {
   const startSectionRef = useRef<HTMLDivElement>(null!);
   const section2Ref = useRef<HTMLDivElement>(null!);
   const section3Ref = useRef<HTMLDivElement>(null!);
-  const section4Ref = useRef<HTMLDivElement>(null);
-  const section5Ref = useRef<HTMLDivElement>(null);
+  const section4Ref = useRef<HTMLDivElement>(null!);
+  const section5Ref = useRef<HTMLDivElement>(null!);
   const router = useRouter();
 
   const sampleQuestions = [
