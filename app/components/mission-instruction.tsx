@@ -42,7 +42,7 @@ const MissionInstruction = ( { title,handleButtonScroll, missionInstruction, mis
                     className="w-[250px] h-[50px] flex items-center justify-center gap-2 bg-[#36CEF8]"
                     onClick={handleButtonScroll}
                   >
-                    See instructions <Mouse />
+                    Start Mission <Mouse />
                   </Button>
                 </div>
   </section>

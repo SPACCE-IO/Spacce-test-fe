@@ -52,7 +52,7 @@ const TaskPaginationSection: React.FC<TaskPaginationSectionProps> = ({
       </div>
           {
             currentStep!== undefined &&
-              currentStep > 2 && <div className="absolute z-30 bottom-10 right-10">
+              currentStep > 1 && <div className="absolute z-30 bottom-10 right-10">
               {children}
               </div>
             

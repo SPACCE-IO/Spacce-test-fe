@@ -213,7 +213,7 @@ const MissionVideoQuestions = ({
                   </div>
 
                   {activeQuestionId === question.id && (
-                    <div className="px-6 pb-6 border-t pt-4">
+                    <div className="pb-6 border-t pt-4">
                       {question.hint && (
                         <div className="mb-3">
                           <button

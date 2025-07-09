@@ -1,5 +1,6 @@
 "use client";
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ChevronUp, ChevronDown, Mouse } from "lucide-react";
 import React, { useState, useRef } from "react";
 
 interface Question {
@@ -87,7 +88,7 @@ const MissionTasksText = ({ questions, onSubmit }: MissionTasksTextProps) => {
                 </div>
                 
                 {activeQuestionId === question.id && (
-                  <div className="px-6 pb-6 border-t pt-4">
+                  <div className=" pb-6 border-t pt-4">
                     {question.hint && (
                       <div className="mb-3">
                         <button
@@ -134,18 +135,15 @@ const MissionTasksText = ({ questions, onSubmit }: MissionTasksTextProps) => {
           </div>
           
           <div className="py-6 flex justify-end">
-            <button
-              className={`px-8 py-3 rounded-md text-white font-medium
-                ${
-                  isAllQuestionsAnswered()
-                    ? "bg-blue-600 hover:bg-blue-700"
-                    : "bg-gray-400 cursor-not-allowed"
-                }`}
+            <Button
+              variant={"default"}
+              className="w-[250px] h-[50px] flex items-center justify-center gap-2 bg-[#36CEF8]"
+              
               onClick={handleSubmit}
               disabled={!isAllQuestionsAnswered()}
             >
-              Submit
-            </button>
+              Submit <Mouse />
+            </Button>
           </div>
         </div>
       </div>

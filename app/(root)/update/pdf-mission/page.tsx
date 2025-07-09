@@ -217,7 +217,7 @@ const MissionPdf = () => {
                     className="w-[250px] h-[50px] flex items-center justify-center gap-2 bg-[#36CEF8]"
                     onClick={() => handleButtonScroll(section2Ref)}
                   >
-                    See instructions <Mouse />
+                    See introduction <Mouse />
                   </Button>
                 </div>
               </div>
