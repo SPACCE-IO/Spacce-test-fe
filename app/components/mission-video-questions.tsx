@@ -96,9 +96,9 @@ const MissionVideoQuestions = ({
   // When drawer is open - matches the PDF viewer layout
   if (isDrawerOpen) {
     return (
-      <div className="relative z-50 h-full bg-white  flex flex-col mx-auto ">
+      <div className="relative z-50 h-full  bg-[#6B7280]/40 backdrop-blur-[2px]  flex flex-col mx-auto ">
         {/* Header */}
-        <header className="flex items-center w-full justify-between px-8 py-4 bg-white">
+        {/* <header className="flex items-center w-full justify-between px-8 py-4 bg-white">
           <div className="flex w-full items-center">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-black rounded"></div>
@@ -112,26 +112,34 @@ const MissionVideoQuestions = ({
               <X className="w-8 h-8" />
             </button>
           </div>
-        </header>
+        </header> */}
 
         {/* Main Content */}
         <div className="flex h-full">
           {/* Left Sidebar */}
-          <div className="w-80 bg-[#A9A9A9] p-8 overflow-y-auto">
-            <h2 className="text-xl font-bold mb-6">Leadership Blueprints</h2>
-            <p className="text-sm text-gray-600 mb-4">
+          <div className="w-96  p-8 overflow-y-auto">
+            {/* <h2 className="text-2xl font-bold mb-6">Leadership Blueprints</h2>
+            <p className="text-lg text-black mb-4">
               Follow the link to view the relevant leadership blueprints and thereafter match the pictures and names
-            </p>
-            {/* <div className="flex justify-center mt-8">
-              <ChevronDown className="w-8 h-8" />
-            </div> */}
+            </p> */}
+            
+            
           </div>
 
           {/* Center Content */}
-          <div className="flex-1 flex flex-col px-12 py-8">
-            <div className="text-left mx-48 mb-8">
+          <div className="flex-1 flex  bg-white flex-col px-12 py-8">
+            <div className=" flex flex-row mb-8">
+              <div>
               <p className="text-gray-400 text-sm mb-2">Mission Name</p>
               <h1 className="text-2xl font-bold">Joining the Curious Club</h1>
+              </div>
+              <button
+              onClick={toggleDrawer}
+              className="p-2 hover:bg-gray-100 ml-auto rounded-lg transition-colors"
+              aria-label="Close fullscreen"
+            >
+              <X className="w-8 h-8" />
+            </button>
             </div>
 
             {/* Video Container */}
@@ -163,7 +171,7 @@ const MissionVideoQuestions = ({
   return (
     <section className="w-full h-screen flex flex-col justify-center">
       <div className="container mx-auto">
-        <div className="grid grid-cols-5 w-full pl-24 h-[calc(100vh-20rem)]">
+        <div className="grid grid-cols-6 w-full pl-24 h-[calc(100vh-20rem)]">
           <div className="col-span-3 flex flex-col h-full justify-center">
             <div className="relative w-[90%]">
               {/* Video here */}
@@ -180,7 +188,7 @@ const MissionVideoQuestions = ({
             </div>
           </div>
 
-          <div className="col-span-2 flex flex-col h-full">
+          <div className="col-span-3 flex flex-col h-full">
             <div
               ref={questionsContainerRef}
               className="flex-1 overflow-y-auto flex flex-col justify-center pr-4 space-y-6 pt-6 max-h-[calc(100vh-16rem)]"

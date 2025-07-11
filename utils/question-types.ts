@@ -21,8 +21,8 @@ const questions = [
   },
   {
     questionType: "W",
-    questionDesc: "Sorting",
-    fullDescription: "Sorting allows users to arrange items in a specific order, such as ascending or descending. This is often used for tasks like organizing lists, prioritizing items, or categorizing information based on certain criteria."
+    questionDesc: "Matching",
+    fullDescription: "Matching allows users to arrange items in a specific order or match items from two lists. This is often used in assessments or quizzes where users need to demonstrate understanding of sequences, relationships, or categories. Users can drag and drop items to sort them correctly."
   },
   {
     questionType: "R",
@@ -219,23 +219,22 @@ const sampleQuestions = [
     ],
   },
 
-  // Sorting (W) - Has correct answer
+  // Matching (W) - Has correct answer
   {
     questionTypeId: "W",
     description: "Sequence arrangement",
     question: "Arrange these steps in the correct order for making coffee:",
-    hint: "Drag and drop the items to sort them in the correct sequence",
+    hint: "Drag and drop the items to match the images with their correct captions",
     sequence: 5,
     hasCorrectAnswer: true, // Has correct order
-    correctAnswer: ["2", "4", "5", "3", "1"], // Correct order by item IDs
+    correctAnswer: ["2", "4", "3", "1"], // Correct order by item IDs
     userAnswer: "",
     isRequired: true,
-    sortingItems: [
-      { id: "1", text: "Serve coffee", correctOrder: 5 },
-      { id: "2", text: "Grind coffee beans", correctOrder: 1 },
-      { id: "3", text: "Pour hot water", correctOrder: 4 },
-      { id: "4", text: "Boil water", correctOrder: 2 },
-      { id: "5", text: "Add coffee to filter", correctOrder: 3 }
+    matchingtems: [
+      { id: "1", imageUrl: "/images/cat.jpg", altText: "Cat", caption: "Cat", correctOrder: 2},
+      { id: "2", imageUrl: "/images/fish.jpg", altText: "Fish", caption: "Fish", correctOrder: 1},
+      { id: "3", imageUrl: "/images/bird.jpg", altText: "Bird", caption: "Bird", correctOrder: 3},
+      { id: "4", imageUrl: "/images/snake.jpg", altText: "Snake", caption: "Snake", correctOrder: 4}
     ],
   },
 
