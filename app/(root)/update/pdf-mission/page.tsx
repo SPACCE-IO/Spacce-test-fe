@@ -157,9 +157,9 @@ const MissionPdf = () => {
       case 1:
         return "";
       case 2:
-        return "Insights";
+        return "Meet a Legend";
       case 3:
-        return "Why I wake up";
+        return "Meet a Legend";
       default:
         return "";
     }
@@ -230,7 +230,7 @@ const MissionPdf = () => {
           className="snap-start h-screen flex justify-center items-center"
         >
           <div className="container mx-auto py-16 flex flex-col items-center">
-            <p className="text-black opacity-30 font-bold">Mission Name</p>
+            {/* <p className="text-black opacity-30 font-bold">Mission Name</p> */}
             <h1 className="text-erify-dark text-[56px] font-bold text-center py-5">
               Meet a Legend
             </h1>
@@ -256,7 +256,7 @@ const MissionPdf = () => {
 
         <div ref={section3Ref} className="snap-start h-screen">
           <MissionInstruction
-            missionName=""
+            missionName="Meet a Legend Badge"
             title=""
             missionInstruction="Have a look at the infographic / pdf to get a better idea on how to submit your tested concept. Your task today is to schedule time in your diary over the next 6 months to work on this. Please schedule a minimum of 2 hours a month. This msision is your initaition into our curious club. Get ready to innovate, learn and grow"
             handleButtonScroll={() => handleButtonScroll(section4Ref)}

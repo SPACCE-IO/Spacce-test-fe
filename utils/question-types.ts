@@ -21,7 +21,7 @@ const questions = [
   },
   {
     questionType: "W",
-    questionDesc: "Matching",
+    questionDesc: "Matching", // match images with text
     fullDescription: "Matching allows users to arrange items in a specific order or match items from two lists. This is often used in assessments or quizzes where users need to demonstrate understanding of sequences, relationships, or categories. Users can drag and drop items to sort them correctly."
   },
   {
@@ -227,14 +227,20 @@ const sampleQuestions = [
     hint: "Drag and drop the items to match the images with their correct captions",
     sequence: 5,
     hasCorrectAnswer: true, // Has correct order
-    correctAnswer: ["2", "4", "3", "1"], // Correct order by item IDs
+    correctAnswer: ["2-A", "1-B", "4-C", "3-D"], // Correct order by item IDs
     userAnswer: "",
     isRequired: true,
     matchingtems: [
-      { id: "1", imageUrl: "/images/cat.jpg", altText: "Cat", caption: "Cat", correctOrder: 2},
-      { id: "2", imageUrl: "/images/fish.jpg", altText: "Fish", caption: "Fish", correctOrder: 1},
-      { id: "3", imageUrl: "/images/bird.jpg", altText: "Bird", caption: "Bird", correctOrder: 3},
-      { id: "4", imageUrl: "/images/snake.jpg", altText: "Snake", caption: "Snake", correctOrder: 4}
+      { id: "1", imageUrl: "/images/cat.jpg", altText: "Cat", caption: "Cat", matchPosition: 2},
+      { id: "2", imageUrl: "/images/fish.jpg", altText: "Fish", caption: "Fish", matchPosition: 1},
+      { id: "3", imageUrl: "/images/bird.jpg", altText: "Bird", caption: "Bird", matchPosition: 3},
+      { id: "4", imageUrl: "/images/snake.jpg", altText: "Snake", caption: "Snake", matchPosition: 4}
+    ],
+    options: [
+      { id: "1", text: "JavaScript", matchPosition: 1 },
+      { id: "2", text: "Python", matchPosition: 4 },
+      { id: "3", text: "HTML", matchPosition: 2 },
+      { id: "4", text: "Java", matchPosition: 3 },
     ],
   },
 
