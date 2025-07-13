@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { ChevronUp, ChevronDown, Maximize2, X, Mouse, Star, Search } from "lucide-react";
 import React, { useState, useRef } from "react";
+import PdfViewer from './PdfViewer';
 
 interface Option {
   id: string;
@@ -55,11 +56,15 @@ interface Question {
 interface MissionVideoQuestionsProps {
   questions: Question[];
   onSubmit: (answers: { [key: number]: string }) => void;
+  missionType?: 'VIDEO_MISSION' | 'PDF_MISSION';
+  fileUrl?: string;
 }
 
 const MissionVideoQuestions = ({
   questions,
   onSubmit,
+  missionType = 'VIDEO_MISSION',
+  fileUrl = '',
 }: MissionVideoQuestionsProps) => {
   const [activeQuestionId, setActiveQuestionId] = useState<number | null>(null);
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});
@@ -70,7 +75,6 @@ const MissionVideoQuestions = ({
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [validationErrors, setValidationErrors] = useState<{ [key: number]: string }>({});
   const questionsContainerRef = useRef<HTMLDivElement>(null);
-console.log("currentPage", currentPage);
   const QUESTIONS_PER_PAGE = 3;
 
   // Use provided questions or sample questions for demo
@@ -203,14 +207,14 @@ console.log("currentPage", currentPage);
     if (draggedItem) {
       // For matching questions, we work with matchingItems
       const currentQuestion = displayQuestions.find((_, index) => index + 1 === questionId);
-      if (currentQuestion?.questionTypeId === "W" && currentQuestion.matchingItems) {
+      if (currentQuestion?.questionTypeId === "W" && 'matchingItems' in currentQuestion && currentQuestion.matchingItems) {
         // Get current order or initialize with default order
         const currentOrder = answers[questionId] ? 
           answers[questionId].split(',') : 
-          currentQuestion.matchingItems.map(item => item.id);
+          currentQuestion.matchingItems.map((item: MatchingItem) => item.id);
         
         // Remove the dragged item from its current position
-        const filteredOrder = currentOrder.filter(id => id !== draggedItem);
+        const filteredOrder = currentOrder.filter((id: string) => id !== draggedItem);
         
         // Insert the dragged item at the target position
         filteredOrder.splice(targetPosition, 0, draggedItem);
@@ -225,7 +229,7 @@ console.log("currentPage", currentPage);
           answers[questionId].split(',') : 
           currentQuestion?.options?.map(opt => opt.id) || [];
         
-        const filteredOrder = currentOrder.filter(id => id !== draggedItem);
+        const filteredOrder = currentOrder.filter((id: string) => id !== draggedItem);
         filteredOrder.splice(targetPosition, 0, draggedItem);
         
         setAnswers((prev) => ({
@@ -276,6 +280,36 @@ console.log("currentPage", currentPage);
 
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
+  };
+
+  // Render content based on mission type
+  const renderContent = () => {
+    if (missionType === 'PDF_MISSION' && fileUrl) {
+      return (
+        <div className="w-full h-full min-h-[600px]">
+          <PdfViewer url={fileUrl} />
+        </div>
+      );
+    } else if (missionType === 'VIDEO_MISSION' && fileUrl) {
+      return (
+        <video 
+          controls 
+          className="w-full h-full object-cover rounded-lg"
+        >
+          <source src={fileUrl} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      );
+    } else {
+      // Fallback placeholder
+      return (
+        <div className="border-2 border-dashed border-gray-300 bg-gray-50 aspect-video rounded-lg flex items-center justify-center">
+          <span className="text-gray-500">
+            {missionType === 'PDF_MISSION' ? 'PDF Placeholder' : 'Video Placeholder'}
+          </span>
+        </div>
+      );
+    }
   };
 
   const renderQuestionInput = (question: Question, index: number) => {
@@ -561,9 +595,6 @@ console.log("currentPage", currentPage);
     }
   };
 
-  // Use provided questions or sample questions for demo
-  // const displayQuestions = questions.length > 1000 ? questions : sampleQuestions1
-
   // When drawer is open - matches the PDF viewer layout
   if (isDrawerOpen) {
     return (
@@ -591,12 +622,10 @@ console.log("currentPage", currentPage);
               </button>
             </div>
 
-            {/* Video Container */}
-            <div className="flex-1 flex items-center justify-center">
-              <div className="w-full max-w-4xl">
-                <div className="border-2 border-dashed border-gray-300 bg-gray-50 aspect-video rounded-lg flex items-center justify-center">
-                  <span className="text-gray-500">Video Placeholder</span>
-                </div>
+            {/* Content Container */}
+            <div className="flex-1 flex items-center justify-center min-h-0">
+              <div className="w-full h-full max-w-4xl">
+                {renderContent()}
               </div>
             </div>
 
@@ -623,9 +652,9 @@ console.log("currentPage", currentPage);
         <div className="grid grid-cols-6 w-full pl-24 h-[calc(100vh-20rem)]">
           <div className="col-span-3 flex flex-col h-full justify-center">
             <div className="relative w-[90%]">
-              {/* Video here */}
-              <div className="border-2 border-dashed border-black bg-gray-50 aspect-video rounded-[15px] flex items-center justify-center">
-                Video Placeholder
+              {/* Content here */}
+              <div className=" aspect-video rounded-[15px] flex items-center justify-center relative">
+                {renderContent()}
                 <button
                   onClick={toggleDrawer}
                   className="absolute bottom-4 right-4 p-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
