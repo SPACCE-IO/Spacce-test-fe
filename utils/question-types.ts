@@ -356,3 +356,514 @@ const sampleQuestions = [
 ];
 
 export { sampleQuestions };
+
+
+export const missionsDummy = [
+  //video
+  {
+    description:
+      "Watch our safety training video to understand the safety procedures and guidelines at our workplace.",
+    documents: [
+      //Mission Video
+      {
+        fileName: "MISSION_VIDEO",
+        name: "string",
+      },
+      //Mission Background
+      {
+        fileName: "MISSION_BACKGROUND",
+        name: "string",
+      },
+      //MCQ files
+    ],
+    iconUrl: "/assets/icon6.png",
+    instruction:
+      "Carefully watch the video and answer the questions that follow to ensure you fully understand our safety policies.",
+    missionType: "VIDEO_MISSION",
+    missionName: "Safety Training",
+    tags: [
+      "Enable digital transformation",
+      "Enable the culture",
+      "Create and enable new ways of working",
+    ],
+    questions: [
+      {
+        question:
+          "Choose the correct features of our new product from the options below.",
+        questionTypeId: 3,
+        desciption: "string",
+        sequence: 0,
+        posterTextPosition: "", //new
+        hint: "string",
+        answer: "Product 1",
+        possibleAnswers: ["Product 1", "Product 2", "Product 3", "Product 4"], //new
+        ratingRange: "",
+      },
+      {
+        question:
+          "What is the first step in case of a fire emergency as mentioned in the video",
+        questionTypeId: 2,
+        desciption: "string",
+        sequence: 0,
+        posterTextPosition: "", //new
+        hint: "string",
+        answer: "true",
+        possibleAnswers: [], //new
+        ratingRange: "",
+      },
+      {
+        question:
+          "On a scale of 1 to 5, how confident are you in using a fire extinguisher after watching the video?",
+        questionTypeId: 6,
+        desciption: "string",
+        sequence: 0,
+        posterTextPosition: "", //new
+        hint: "string",
+        answer: "true",
+        possibleAnswers: [], //new
+        ratingRange: "5",
+      },
+    ],
+    report: {
+      email: "test@email.com",
+      reportTypeId: 1,
+    },
+    rewards: [
+      {
+        sequence: 0,
+        type: "B",
+        name: "Badge",
+        tags: ["string"],
+        pointsText: "string",
+        files: [
+          {
+            fileName: "/assets/trophy.png",
+          },
+        ],
+      },
+    ],
+    typeSpecificInfo: [
+      {
+        name: "string",
+        value: "string",
+      },
+    ],
+    workspaceId: 1,
+  },
+  //Appriciation
+  {
+    description:
+      "This mission is about recognizing and appreciating the work of your colleagues.",
+    documents: [
+      //Mission Background
+      {
+        fileName: "MISSION_BACKGROUND",
+        name: "string",
+      },
+    ],
+    iconUrl: "/assets/icon5.png",
+    instruction:
+      "Choose a colleague whose work you appreciate, explain why, and express your gratitude.",
+    missionType: "APPRECIATION_MISSION",
+    missionName: "Cheers to Peers",
+    tags: [
+      "Leadership skills and training",
+      "Enable a new strategy",
+      "Enable a sales transformation",
+    ],
+    questions: [
+      {
+        question: "string",
+        questionTypeId: 1,
+        desciption: "string",
+        sequence: 0,
+        posterTextPosition: "", //new
+        hint: "string",
+        answer: "true",
+        possibleAnswers: [], //new
+        ratingRange: "",
+      },
+    ],
+    report: {
+      email: "test@email.com",
+      reportTypeId: 1,
+    },
+    rewards: [
+      {
+        sequence: 0,
+        type: "B",
+        name: "Badge",
+        tags: ["string"],
+        pointsText: "string",
+        files: [
+          {
+            fileName: "/assets/star.png",
+          },
+        ],
+      },
+    ],
+    typeSpecificInfo: [
+      {
+        name: "string",
+        value: "string",
+      },
+    ],
+    workspaceId: 1,
+  },
+  //Standard - done
+  {
+    description:
+      "A dedicated mission for leaders to share their strategic insights and future vision for the organization",
+    documents: [
+      //Mission Background
+      {
+        fileName: "MISSION_BACKGROUND",
+        name: "string",
+      },
+      //MCQ files
+      {
+        fileName: "file 1",
+        name: "/assets/musical-note.png",
+      },
+      {
+        fileName: "file 2",
+        name: "/assets/enterprise.png",
+      },
+      {
+        fileName: "file 3",
+        name: "/assets/sports.png",
+      },
+      {
+        fileName: "file 4",
+        name: "/assets/division.png",
+      },
+    ],
+    iconUrl: "/assets/icon4.png",
+    instruction:
+      "Provide your key strategic insights for the upcoming quarter and your vision for future growth.",
+    missionType: "STANDARD_MISSION",
+    missionName: "Strategic Leadership Insights",
+    tags: [
+      "Drive employee engagement",
+      "Technology adoption",
+      "Merger and acquisation",
+    ],
+    questions: [
+      {
+        question:
+          "What are your key strategic insights for the upcoming quarter?",
+        questionTypeId: 2,
+        desciption: "string",
+        sequence: 0,
+        posterTextPosition: "", //new
+        hint: "string",
+        answer: "true",
+        possibleAnswers: [], //new
+        ratingRange: "",
+      },
+      {
+        question:
+          "What is your vision for our organization's growth in the next year?",
+        questionTypeId: 2,
+        desciption: "string",
+        sequence: 0,
+        posterTextPosition: "", //new
+        hint: "string",
+        answer: "true",
+        possibleAnswers: [], //new
+        ratingRange: "",
+      },
+      {
+        question:
+          "From the following, what is the most critical element for achieving our growth vision?",
+        questionTypeId: 3,
+        desciption: "string",
+        sequence: 0,
+        posterTextPosition: "", //new
+        hint: "string",
+        answer: "Customer Satisfaction",
+        possibleAnswers: [
+          "Innovation",
+          "Customer Satisfaction",
+          "Operational Efficiency",
+          "Talent Development",
+        ], //new
+        ratingRange: "",
+      },
+      {
+        question:
+          "On a scale of 1 to 10, how would you rate the current strategic alignment of your department with the overall company vision?",
+        questionTypeId: 6,
+        desciption: "string",
+        sequence: 0,
+        posterTextPosition: "", //new
+        hint: "string",
+        answer: "true",
+        possibleAnswers: [], //new
+        ratingRange: "10",
+      },
+      {
+        question: "which picture represents music ?",
+        questionTypeId: 4,
+        desciption: "string",
+        sequence: 0,
+        posterTextPosition: "", //new
+        hint: "string",
+        answer: "file 1",
+        possibleAnswers: ["file 1", "file 2", "file 3", "file 4"], //new
+        ratingRange: "10",
+      },
+    ],
+    report: {
+      email: "test@email.com",
+      reportTypeId: 1,
+    },
+    rewards: [
+      {
+        sequence: 0,
+        type: "B",
+        name: "Badge",
+        tags: ["string"],
+        pointsText: "string",
+        files: [
+          {
+            fileName: "/assets/rewards.png",
+          },
+        ],
+      },
+    ],
+    typeSpecificInfo: [
+      {
+        name: "string",
+        value: "string",
+      },
+    ],
+    workspaceId: 1,
+  },
+  //Poster
+  {
+    description:
+      "Create a visual representation of your goals and aspirations at our company.",
+    documents: [
+      //Mission Poster
+      {
+        fileName: "MISSION_POSTER",
+        name: "string",
+      },
+      //Mission Background
+      {
+        fileName: "MISSION_BACKGROUND",
+        name: "string",
+      },
+      //MCQ files
+      {
+        fileName: "string",
+        name: "string",
+      },
+    ],
+    iconUrl: "/assets/icon3.png",
+    instruction:
+      "Select images that represent your professional goals and aspirations. These will be used to create your personal vision board.",
+    missionType: "POSTER_MISSION",
+    missionName: "Vision Board",
+    tags: [
+      "OKRs",
+      "Learning organization (Learning in action)",
+      "Employee omboarding",
+    ],
+    questions: [
+      {
+        question:
+          "Describe how the uploaded images represent your career goals.",
+        questionTypeId: 2,
+        desciption: "string",
+        sequence: 0,
+        posterTextPosition: "", //new
+        hint: "string",
+        answer: "true",
+        possibleAnswers: [], //new
+        ratingRange: "",
+      },
+      {
+        question:
+          "On a scale of 1 to 10, how confident are you that your idea can be implemented?",
+        questionTypeId: 6,
+        desciption: "string",
+        sequence: 0,
+        posterTextPosition: "", //new
+        hint: "string",
+        answer: "true",
+        possibleAnswers: [], //new
+        ratingRange: "10",
+      },
+    ],
+    report: {
+      email: "test@email.com",
+      reportTypeId: 1,
+    },
+    rewards: [
+      {
+        sequence: 0,
+        type: "B",
+        name: "Badge",
+        tags: ["string"],
+        pointsText: "string",
+        files: [
+          {
+            fileName: "/assets/reward.png",
+          },
+        ],
+      },
+    ],
+    typeSpecificInfo: [
+      {
+        name: "string",
+        value: "string",
+      },
+    ],
+    workspaceId: 1,
+  },
+  //Anonymous
+  {
+    description:
+      "Share your honest thoughts and feelings about the company culture. Your responses are completely anonymous.",
+    documents: [
+      //Mission Background
+      {
+        fileName: "MISSION_BACKGROUND",
+        name: "string",
+      },
+    ],
+    iconUrl: "/assets/icon2.png",
+    instruction:
+      "Answer the following questions honestly. Your responses will remain anonymous.",
+    missionType: "ANONYMOUS_MISSION",
+    missionName: "Anonymous Feedback",
+    tags: [
+      "Enable re-organizational design",
+      "Engagement surveys: Pulse survey and feedback",
+      "Diversity and inclusion",
+    ],
+    questions: [
+      {
+        question:
+          "What's one thing you would change about the company culture?",
+        questionTypeId: 2,
+        desciption: "string",
+        sequence: 0,
+        posterTextPosition: "", //new
+        hint: "string",
+        answer: "true",
+        possibleAnswers: [], //new
+        ratingRange: "",
+      },
+      {
+        question:
+          "What's something you really appreciate about the company culture?",
+        questionTypeId: 2,
+        desciption: "string",
+        sequence: 0,
+        posterTextPosition: "", //new
+        hint: "string",
+        answer: "true",
+        possibleAnswers: [], //new
+        ratingRange: "",
+      },
+      {
+        question:
+          "Choose the department that, in your opinion, requires the most improvement.",
+        questionTypeId: 3,
+        desciption: "string",
+        sequence: 0,
+        posterTextPosition: "", //new
+        hint: "string",
+        answer: "Department 2",
+        possibleAnswers: [
+          "Department 1",
+          "Department 2",
+          "Department 3",
+          "Department 4",
+        ], //new
+        ratingRange: "",
+      },
+    ],
+    report: {
+      email: "test@email.com",
+      reportTypeId: 1,
+    },
+    rewards: [
+      {
+        sequence: 0,
+        type: "B",
+        name: "Badge",
+        tags: ["string"],
+        pointsText: "string",
+        files: [
+          {
+            fileName: "/assets/cup.png",
+          },
+        ],
+      },
+    ],
+    typeSpecificInfo: [
+      {
+        name: "string",
+        value: "string",
+      },
+    ],
+    workspaceId: 1,
+  },
+  //PDF
+  {
+    description: "Review the company's updated policy document.",
+    isComplete: false,
+    documents: [
+      //Mission PDF
+      {
+        fileName: "MISSION_PDF",
+        name: "/dummy2.pdf",
+      },
+      //Mission Background
+      {
+        fileName: "MISSION_BACKGROUND",
+        name: "/dummy2.pdf",
+      },
+    ],
+    iconUrl: "@/public/assets/badges/standard.svg",
+    instruction:
+      "Read through the attached PDF for comprehensive understanding of our current policies.",
+    missionType: "PDF_MISSION",
+    missionName: "Policy Review",
+    tags: [
+      "Intern/Graduate onboarding",
+      "offboarding",
+      "Ad-hoc organizational change",
+    ],
+    questions: sampleQuestions,
+    report: {
+      email: "test@email.com",
+      reportTypeId: 1,
+    },
+    rewards: [
+      {
+        sequence: 0,
+        type: "L",
+        name: "Multipass",
+        tags: ["string"],
+        pointsText: "string",
+        files: [
+          {
+            fileName: "@/public/assets/badges/standard.svg",
+          },
+        ],
+      },
+    ],
+    typeSpecificInfo: [
+      {
+        name: "string",
+        value: "string",
+      },
+    ],
+    workspaceId: 1,
+  },
+];

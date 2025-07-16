@@ -585,7 +585,7 @@ const MissionVideoQuestions = ({
   return (
     <section className="w-full h-screen flex flex-col justify-center">
       <div className="container mx-auto">
-        <div className="grid grid-cols-5 w-full pl-24 h-[calc(100vh-20rem)]">
+        <div className="grid grid-cols-5 w-full pl-24 h-[calc(100vh-26rem)]">
           <div className="col-span-3 flex flex-col h-full justify-center">
             <div className="relative w-[90%]">
               {/* Video here */}

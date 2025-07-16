@@ -39,7 +39,7 @@ const MissionInstruction = ( { title,handleButtonScroll, missionInstruction, mis
         <div className="flex absolute bottom-28 w-full mx-auto  justify-center items-center ">
                   <Button
                     variant={"default"}
-                    className="w-[250px] h-[50px] flex items-center justify-center gap-2 bg-[#36CEF8]"
+              className="w-[250px] h-[50px] rounded-md flex items-center text-white font-bold justify-center gap-2 bg-gradient-to-t from-[#B276FF] to-[#7C2BDA]"
                     onClick={handleButtonScroll}
                   >
                     Start Mission <Mouse />

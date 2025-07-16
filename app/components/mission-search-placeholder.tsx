@@ -47,7 +47,7 @@ const MissionSearchPlaceholder = ({
   return (
     <section className="min-h-screen  gap-16 p-5 flex justify-center items-center mx-auto container relative z-40 ">
       {children}
-      <div className="grid grid-cols-5  gap-10 ">
+      <div className="grid grid-cols-6  gap-10 ">
         <div className="col-span-3 flex flex-col justify-center relative -top-16 text-2xl font-light">
           <div>
             {/* Mission Description Here */}
@@ -75,13 +75,13 @@ const MissionSearchPlaceholder = ({
           </div>
         </div>
         {option === true ? (
-          <div className="col-span-2 justify-between gap-4 grid grid-flow-row">
+          <div className="col-span-3 justify-between gap-4 grid grid-flow-row">
             {varient === "image" ? (
-              <div className=" h-[520px] w-[372px]  border-neutral-300 bg-[#F4F4F4] justify-center items-center flex rounded-[5px]">
+              <div className=" h-[520px] w-[90%]  border-neutral-300 bg-[#F4F4F4] justify-center items-center flex rounded-[5px]">
                 <ImagesIcon />
               </div>
             ) : varient === "text" ? (
-              <div className=" h-[520px] w-[372px] border-2  border-black border-opacity-50 border-dashed bg-[#F4F4F4] justify-center items-center flex rounded-[15px]">
+              <div className=" h-[520px] w-[90%] border-2  border-black border-opacity-50 border-dashed bg-[#F4F4F4] justify-center items-center flex rounded-[15px]">
                 Select Employee
               </div>
             ): <></>}
@@ -93,13 +93,13 @@ const MissionSearchPlaceholder = ({
             </div>
           </div>
         ) : (
-          <div className="col-span-2 flex">
+          <div className="col-span-3 flex">
             {varient === "image" ? (
-              <div className=" h-[520px] w-[372px]  border-neutral-300 bg-[#F4F4F4] justify-center items-center flex rounded-[5px]">
+              <div className=" h-[520px] w-[90%]  border-neutral-300 bg-[#F4F4F4] justify-center items-center flex rounded-[5px]">
                 <ImagesIcon />
               </div>
             ) : (
-              <div className=" h-[520px] w-[372px] border-2  border-black border-opacity-50 border-dashed bg-[#F4F4F4] justify-center items-center flex rounded-[15px]">
+              <div className=" h-[520px] w-[90%] border-2  border-black border-opacity-50 border-dashed bg-[#F4F4F4] justify-center items-center flex rounded-[15px]">
                 Select Employee
               </div>
             )}

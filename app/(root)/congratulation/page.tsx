@@ -32,7 +32,7 @@ const Congratulations = () => {
                 <Button 
                 onClick={handleClick}
                  variant={"default"}
-              className="w-[250px] h-[50px] border border-[#B276FF] flex items-center text-[#6C50E0] justify-center gap-2 bg-[#EDDDFF]"
+              className="w-[250px] h-[50px] border-[1.5px] border-[#B276FF] flex items-center text-[#6C50E0] font-bold justify-center gap-2 bg-gradient-to-t from-[#EDDDFF] to-[#FCFAFF]"
                  
                 >
                   See Progress <Mouse />

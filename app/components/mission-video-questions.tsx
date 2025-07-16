@@ -56,7 +56,7 @@ interface Question {
 interface MissionVideoQuestionsProps {
   questions: Question[];
   onSubmit: (answers: { [key: number]: string }) => void;
-  missionType?: 'VIDEO_MISSION' | 'PDF_MISSION';
+  missionType?: 'VIDEO_MISSION' | 'MISSION_PDF';
   fileUrl?: string;
 }
 
@@ -66,6 +66,7 @@ const MissionVideoQuestions = ({
   missionType = 'VIDEO_MISSION',
   fileUrl = '',
 }: MissionVideoQuestionsProps) => {
+  console.log("MissionVideoQuestions Props:", { questions, onSubmit, missionType, fileUrl }); 
   const [activeQuestionId, setActiveQuestionId] = useState<number | null>(null);
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});
   const [showHintId, setShowHintId] = useState<number | null>(null);
@@ -78,7 +79,7 @@ const MissionVideoQuestions = ({
   const QUESTIONS_PER_PAGE = 3;
 
   // Use provided questions or sample questions for demo
-   const displayQuestions = questions.length > 1000 ? questions : sampleQuestions1
+   const displayQuestions = questions?.length > 0 ? questions : sampleQuestions1
 
 
   const totalPages = Math.ceil(displayQuestions.length / QUESTIONS_PER_PAGE);
@@ -284,7 +285,7 @@ const MissionVideoQuestions = ({
 
   // Render content based on mission type
   const renderContent = () => {
-    if (missionType === 'PDF_MISSION' && fileUrl) {
+    if (missionType === 'MISSION_PDF' && fileUrl) {
       return (
         <div className="w-full h-full min-h-[600px]">
           <PdfViewer url={fileUrl} />
@@ -305,7 +306,7 @@ const MissionVideoQuestions = ({
       return (
         <div className="border-2 border-dashed border-gray-300 bg-gray-50 aspect-video rounded-lg flex items-center justify-center">
           <span className="text-gray-500">
-            {missionType === 'PDF_MISSION' ? 'PDF Placeholder' : 'Video Placeholder'}
+            {missionType === 'MISSION_PDF' ? 'PDF Placeholder' : 'Video Placeholder'}
           </span>
         </div>
       );
@@ -696,9 +697,7 @@ const MissionVideoQuestions = ({
                   <div
                     id={`question-${questionId}`}
                     key={questionId}
-                    className={`w-full bg-white overflow-hidden border-l-4 ${
-                      hasError ? 'border-red-500' : 'border-transparent'
-                    }`}
+                    className={`w-full bg-white overflow-hidden `}
                   >
                     <div
                       className={`p-2 cursor-pointer flex justify-between items-center transition-colors ${
@@ -771,7 +770,8 @@ const MissionVideoQuestions = ({
           <Button
             onClick={handlePreviousPage}
             variant="default"
-            className="w-[250px] h-[50px] flex items-center justify-center gap-2 bg-[#36CEF8]"
+                          className="w-[250px] h-[50px] rounded-md flex items-center text-white font-bold justify-center gap-2 bg-gradient-to-t from-[#B276FF] to-[#7C2BDA]"
+
           >
             Previous
           </Button>
@@ -782,15 +782,17 @@ const MissionVideoQuestions = ({
           <Button
             onClick={handleNextPage}
             variant="default"
-            className="w-[250px] h-[50px] flex items-center justify-center gap-2 bg-[#36CEF8]"
+                          className="w-[250px] h-[50px] border-[1.5px] border-[#B276FF] rounded-md flex items-center text-[#6C50E0] font-bold justify-center gap-2 bg-gradient-to-t from-[#EDDDFF] to-[#FCFAFF]"
+
           >
-            Next <Mouse />
+            Next 
           </Button>
         ) : (
           <Button
             onClick={handleSubmit}
             variant="default"
-            className="w-[250px] h-[50px] flex items-center justify-center gap-2 bg-[#36CEF8]"
+                          className="w-[250px] h-[50px] border border-[#B276FF] rounded-md flex items-center text-[#6C50E0] font-bold justify-center gap-2 bg-gradient-to-t from-[#EDDDFF] to-[#FCFAFF]"
+
           >
             Submit <Mouse />
           </Button>
@@ -802,7 +804,7 @@ const MissionVideoQuestions = ({
 
 export default MissionVideoQuestions;
 
-const sampleQuestions1 = [
+export const sampleQuestions1 = [
   // OPEN-ENDED QUESTIONS (Survey/Poster missions)
   
   // Short Answer (S) - Open-ended
