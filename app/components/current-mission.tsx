@@ -26,10 +26,41 @@ import PdfDone from "@/public/assets/badges/pdfDone.svg"
 import Anonymous from "@/public/assets/badges/anonymous.svg"
 import AnonymousDone from "@/public/assets/badges/anonymousDone.svg"
 import AnimatedBadge from "./AnimatedBadge"
+import { useGetDashboardQuery } from "../store/services/userManagement"
+import { getAuthToken } from "@/utils/auth"
 
 const myFont = localFont({ src: "../fonts/Satoshi-Medium.woff" })
 
 gsap.registerPlugin(ScrollTrigger)
+
+interface ApiMission {
+  missionId: number
+  name: string
+  status: "InProgress" | "NotStarted" | "Completed"
+  sequence: number
+  rewards: Array<{
+    rewardId: number
+    type: string
+    name: string
+    tag: string[]
+    url: Array<{
+      fileName: string
+      contentType: string
+      url: string
+    }>
+  }>
+}
+
+interface DashboardData {
+  firstName: string
+  lastName: string
+  profilePicUrl?: {
+    fileName: string
+    contentType: string
+    url: string
+  }
+  missions: ApiMission[]
+}
 
 interface Mission {
   id: number
@@ -37,107 +68,115 @@ interface Mission {
   url: string
   description: string
   isCompleted: boolean
-  status: string
+  status: "completed" | "active" | "incomplete"
   badge: {
     completed: typeof StandardDone
     incomplete: typeof Standard
   }
   animation: string
+  rewardUrl?: string
+  sequence: number
 }
 
-const missions: Mission[] = [
-  {
-    id: 1,
-    title: "Standard Mission",
-    url: "mission",
-    description: "Learn about our core values and principles.",
-    isCompleted: true,
-    status: "completed",
-    badge: { completed: StandardDone, incomplete: Standard },
-    animation: "zoomPop"
-  },
-  {
-    id: 2,
-    title: "Leadership Mission",
-    url: "leadership",
-    description: "Discover effective collaboration strategies.",
-    isCompleted: true,
-    status: "completed",
-    badge: { completed: LeadershipDone, incomplete: Leadership },
-    animation: "dropBounce"
-  },
-  {
-    id: 3,
-    title: "Two Minute Appreciation Mission",
-    url: "two-minute-appreciation",
-    description: "Enhance your leadership capabilities.",
-    isCompleted: false,
-    status: "active",
-    badge: { completed: TwoMinuteDone, incomplete: TwoMinute },
-    animation: "fadeUp"
-  },
-  {
-    id: 4,
-    title: "System Training Mission",
-    url: "system-training",
-    description: "Explore creative problem-solving techniques.",
-    isCompleted: false,
-    status: "incomplete",
-    badge: { completed: SystemTrainingDone, incomplete: SystemTraining },
-    animation: "zoomPop"
-  },
-  {
-    id: 5,
-    title: "Poster Mission",
-    url: "poster-mission",
-    description: "Understand modern technological advances.",
-    isCompleted: false,
-    status: "incomplete",
-    badge: { completed: PosterDone, incomplete: Poster },
-    animation: "dropBounce"
-  },
-  {
-    id: 6,
-    title: "Video Mission",
-    url: "video-missions",
-    description: "Learn to develop effective business strategies.",
-    isCompleted: false,
-    status: "incomplete",
-    badge: { completed: VideoDone, incomplete: Video },
-    animation: "fadeUp"
-  },
-  {
-    id: 7,
-    title: "Pdf Mission",
-    url: "pdf-mission",
-    description: "Master customer service principles.",
-    isCompleted: false,
-    status: "incomplete",
-    badge: { completed: PdfDone, incomplete: Pdf },
-    animation: "zoomPop"
-  },
-  {
-    id: 8,
-    title: "Anonymous Mission",
-    url: "anonymous",
-    description: "Develop project management skills.",
-    isCompleted: false,
-    status: "incomplete",
-    badge: { completed: AnonymousDone, incomplete: Anonymous },
-    animation: "dropBounce"
-  },
-]
+// Badge mapping - you can customize this based on mission type or sequence
+const getBadgeBySequence = (sequence: number) => {
+  const badges = [
+    { completed: StandardDone, incomplete: Standard },
+    { completed: LeadershipDone, incomplete: Leadership },
+    { completed: TwoMinuteDone, incomplete: TwoMinute },
+    { completed: SystemTrainingDone, incomplete: SystemTraining },
+    { completed: PosterDone, incomplete: Poster },
+    { completed: VideoDone, incomplete: Video },
+    { completed: PdfDone, incomplete: Pdf },
+    { completed: AnonymousDone, incomplete: Anonymous },
+  ]
+  return badges[(sequence - 1) % badges.length] || badges[0]
+}
+
+// Animation mapping
+const getAnimationBySequence = (sequence: number) => {
+  const animations = ["zoomPop", "dropBounce", "fadeUp"]
+  return animations[(sequence - 1) % animations.length]
+}
+
+const truncateWithEllipsis = (str: string, maxLength: number = 40): string => {
+  return str.length > maxLength ? str.slice(0, maxLength) + '...' : str;
+}
+
+
+// Convert API status to our status format
+const convertStatus = (apiStatus: string): "completed" | "active" | "incomplete" => {
+  switch (apiStatus) {
+    case "Completed":
+      return "completed"
+    case "InProgress":
+      return "active"
+    case "NotStarted":
+    default:
+      return "incomplete"
+  }
+}
 
 export default function CurrentMission() {
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null)
+  const [missions, setMissions] = useState<Mission[]>([])
+  const [userInfo, setUserInfo] = useState<{ firstName: string; lastName: string; profilePicUrl?: string }>({
+    firstName: "",
+    lastName: ""
+  })
+  
   const timelineRef = useRef<HTMLDivElement>(null)
   const missionsRef = useRef<(HTMLDivElement | null)[]>([])
+
+  const token = getAuthToken()
+  const { data, isLoading, isError, isSuccess } = useGetDashboardQuery(token)
 
   const router = useRouter()
 
   const setMissionRef = useCallback((el: HTMLDivElement | null, index: number) => {
     missionsRef.current[index] = el
   }, [])
+
+  // Process API data when it's available
+  useEffect(() => {
+    if (isSuccess && data) {
+      const dashboardData = data as DashboardData
+      
+      // Set user info
+      setUserInfo({
+        firstName: dashboardData.firstName,
+        lastName: dashboardData.lastName,
+        profilePicUrl: dashboardData.profilePicUrl?.url
+      })
+
+      // Convert API missions to our mission format
+      const convertedMissions: Mission[] = [...dashboardData.missions] // Create a copy first
+        .sort((a, b) => a.sequence - b.sequence) // Sort by sequence
+        .map((apiMission) => {
+          const status = convertStatus(apiMission.status)
+          const isCompleted = status === "completed"
+          
+          return {
+            id: apiMission.missionId,
+            title: apiMission.name,
+            url: `mission/${apiMission.missionId}`, // You can customize this URL structure
+            description: `Complete the ${apiMission.name} to earn your reward.`, // Customize description as needed
+            isCompleted,
+            status,
+            badge: getBadgeBySequence(apiMission.sequence),
+            animation: getAnimationBySequence(apiMission.sequence),
+            rewardUrl: apiMission.rewards[0]?.url[0]?.url, // Get the first reward URL
+            sequence: apiMission.sequence
+          }
+        })
+
+      setMissions(convertedMissions)
+
+      // Set default selected mission (first active or first mission)
+      const activeMission = convertedMissions.find((mission) => mission.status === "active")
+      setSelectedMission(activeMission || convertedMissions[0])
+    }
+  }, [isSuccess, data])
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -154,34 +193,11 @@ export default function CurrentMission() {
             scrub: true,
           },
         })
-
-        // Animate each mission item
-        // missionsRef.current.forEach((mission) => {
-        //   if (mission) {
-        //     gsap.from(mission, {
-        //       opacity: 0,
-        //       y: 20,
-        //       duration: 0.5,
-        //       scrollTrigger: {
-        //         trigger: mission,
-        //         start: "top bottom-=100",
-        //         end: "top center",
-        //         toggleActions: "play none none reverse",
-        //       },
-        //     })
-        //   }
-        // })
       })
 
       return () => ctx.revert()
     }
-  }, [])
-
-  useEffect(() => {
-    // Set default selected mission
-    const activeMission = missions.find((mission) => mission.status === "active")
-    setSelectedMission(activeMission || missions[0])
-  }, [])
+  }, [missions])
 
   const handleClick = (mission: Mission | null) => {
     if (mission) {
@@ -193,11 +209,40 @@ export default function CurrentMission() {
 
   const completedMissions = missions.filter((mission) => mission.isCompleted).length
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="container h-[90vh] w-full p-5 mx-auto flex flex-col justify-center items-center">
+        <div className="text-white text-lg">Loading missions...</div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (isError) {
+    return (
+      <div className="container h-[90vh] w-full p-5 mx-auto flex flex-col justify-center items-center">
+        <div className="text-red-400 text-lg">Failed to load missions. Please try again.</div>
+      </div>
+    )
+  }
+
+  // Empty state
+  if (missions.length === 0) {
+    return (
+      <div className="container h-[90vh] w-full p-5 mx-auto flex flex-col justify-center items-center">
+        <div className="text-gray-400 text-lg">No missions available at the moment.</div>
+      </div>
+    )
+  }
+
   return (
-    <div className=" container h-[90vh] w-full p-5 mx-auto flex flex-col justify-center items-center">
-      <div className={`grid lg:grid-cols-4 gap-16 `}>
+    <div className="container h-[90vh] w-full p-5 mx-auto flex flex-col justify-center items-center">
+      <div className={`grid lg:grid-cols-4 gap-16`}>
         <div className="space-y-4 col-span-1">
-          <h2 className="text-[24px] font-bold text-white">Mission Moment Title</h2>
+          <h2 className="text-[24px] font-bold text-white">
+            {userInfo.firstName ? `${userInfo.firstName}'s Missions` : "Mission Moment Title"}
+          </h2>
           <div className="h-[580px] w-[273px] rounded-md relative">
             <ScrollArea className="h-full w-full rounded-md">
               <div className="relative space-y-4 px-4 pt-4 pb-14" ref={timelineRef}>
@@ -219,30 +264,28 @@ export default function CurrentMission() {
                     ${mission.isCompleted ? "" : ""}`}
                         onClick={() => setSelectedMission(mission)}
                       >
-                        <div className=" w-[24px] h-full flex flex-col items-center justify-start gap-1  mt-[6px] ">
+                        <div className="w-[24px] h-full flex flex-col items-center justify-start gap-1 mt-[6px]">
                           {/* Timeline dot */}
                           <div
-                            className={` border-gray-600 bg-transparent w-[20px] h-[20px] rounded-full border-2 flex items-center justify-center relative mx-auto ${
+                            className={`border-gray-600 bg-transparent w-[20px] h-[20px] rounded-full border-2 flex items-center justify-center relative mx-auto ${
                               mission.isCompleted ? "border-purple-500 bg-transparent" : isSelected ? "" : ""
                             }
                     ${mission.status === "active" ? "border-purple-500 bg-transparent" : ""}
                     `}
                           >
                             <div
-                              className={` w-[10px] h-[10px] rounded-full ${
-                                mission.isCompleted ? " border-black bg-purple-500" : isSelected ? "" : ""
-                              }
-                              
-                                      `}
+                              className={`w-[10px] h-[10px] rounded-full ${
+                                mission.isCompleted ? "border-black bg-purple-500" : isSelected ? "" : ""
+                              }`}
                             />
                           </div>
                           {/* Mission Line */}
                           <div
                             className={`
-                    ${mission.isCompleted ? " w-[3px] bg-purple-500 h-[68px]" : isSelected ? "" : ""}
+                    ${mission.isCompleted ? "w-[3px] bg-purple-500 h-[68px]" : isSelected ? "" : ""}
                     ${
                       mission.status === "active"
-                        ? " w-[3px] bg-gradient-to-b from-purple-500  to-transparent  h-[60px]"
+                        ? "w-[3px] bg-gradient-to-b from-purple-500 to-transparent h-[60px]"
                         : ""
                     }
                     `}
@@ -255,8 +298,8 @@ export default function CurrentMission() {
                             mission.isCompleted ? "text-white" : isSelected ? "text-white" : "text-gray-500"
                           }`}
                         >
-                          <h3 className="text-base leading-5">{mission.title}</h3>
-                          <p className="text-base mt-1 opacity-[75%] leading-[22.4px]">{mission.description}</p>
+                          <h3 className="text-base font-semibold leading-5">{mission.title}</h3>
+                          <p className="text-base mt-1 opacity-[75%] leading-[22.4px]">{truncateWithEllipsis(mission.description)}</p>
                         </div>
                       </div>
                     )
@@ -264,7 +307,7 @@ export default function CurrentMission() {
                 </div>
               </div>
             </ScrollArea>
-            <div className=" h-[230px] w-[273px] rounded-md absolute bottom-0 z-10 bg-gradient-to-t from-[#1a1a1a]  to-transparent pointer-events-none"></div>
+            <div className="h-[230px] w-[273px] rounded-md absolute bottom-0 z-10 bg-gradient-to-t from-[#1a1a1a] to-transparent pointer-events-none"></div>
           </div>
 
           <div className="text-sm text-gray-400">
@@ -273,24 +316,35 @@ export default function CurrentMission() {
         </div>
 
         <div className="space-y-4 col-span-3 container mx-auto flex-col flex items-center pt-4 gap-10">
-          <div className="flex items-center rounded-full ">
+          <div className="flex items-center rounded-full">
             {selectedMission && (
               <AnimatedBadge
                 amplitude={20}
                 revealType={selectedMission.animation}
                 triggerAnimation={selectedMission?.id} // Pass the selected mission ID as the trigger
               >
-                <Image
-                  src={
-                    selectedMission.isCompleted || selectedMission.status == "active"
-                      ? selectedMission.badge.completed
-                      : selectedMission.badge.incomplete
-                  }
-                  alt={`Badge for ${selectedMission.title}`}
-                  height={400}
-                  width={400}
-                  className="badge-gradient"
-                />
+                {/* Show reward image if available, otherwise show badge */}
+                {!selectedMission.rewardUrl ? (
+                  <img
+                    src={selectedMission.rewardUrl}
+                    alt={`Reward for ${selectedMission.title}`}
+                    height={400}
+                    width={400}
+                    className="badge-gradient rounded-full object-cover"
+                  />
+                ) : (
+                  <Image
+                    src={
+                      selectedMission.isCompleted || selectedMission.status === "active"
+                        ? selectedMission.badge.completed
+                        : selectedMission.badge.incomplete
+                    }
+                    alt={`Badge for ${selectedMission.title}`}
+                    height={400}
+                    width={400}
+                    className="badge-gradient"
+                  />
+                )}
               </AnimatedBadge>
             )}
           </div>
@@ -303,7 +357,7 @@ export default function CurrentMission() {
               className="bg-purple-600 hover:bg-purple-700"
               onClick={() => handleClick(selectedMission)}
             >
-              {selectedMission && !selectedMission.isCompleted ? "Start Mission" : "Next Mission"}
+              {selectedMission && !selectedMission.isCompleted ? "Start Mission" : "View Mission"}
             </Button>
           </div>
         </div>
@@ -311,4 +365,3 @@ export default function CurrentMission() {
     </div>
   )
 }
-

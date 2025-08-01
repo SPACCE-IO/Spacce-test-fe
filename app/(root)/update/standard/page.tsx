@@ -249,10 +249,10 @@ const Mission = () => {
             {/* <div className="pb-12">
               <Mouse />
             </div> */}
-            <div className="flex justify-center items-center border border-dashed border-black bg-neutral-100  aspect-square h-[320px] rounded-[15px]">
+            {/* <div className="flex justify-center items-center border border-dashed border-black bg-neutral-100  aspect-square h-[320px] rounded-[15px]">
               {" "}
               Meet a Legend Badge
-            </div>
+            </div> */}
           </div>
         </div>
 

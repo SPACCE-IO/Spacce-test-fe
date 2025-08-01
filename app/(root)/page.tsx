@@ -13,6 +13,10 @@ export default function Home() {
     router.push("/landing-page");
   };
 
+  const handleMissionRoute = (path:any) => {
+    router.push(path);
+  };
+
   const handleNewMission = () => {
     router.push("/update/standard-mission");
   };
@@ -61,6 +65,15 @@ export default function Home() {
   return (
     <div className="grid grid-cols-2 gap-4 px-40 h-screen py-52 bg-gradient-custom-center-home">
       <div className="col-span-2 text-white text-opacity-90 text-lg">Page Navigation</div>
+      <Button variant={"primary"} className=" border-green-300" onClick={()=> handleMissionRoute('/update/standard')}>Standard Mission</Button>
+      <Button variant={"primary"} className=" border-green-300" onClick={()=> handleMissionRoute('/update/pdf')}>PDF Mission</Button>
+      <Button variant={"primary"} className=" border-green-300" onClick={()=> handleMissionRoute('/update/appreciation')}>Appreciation Mission</Button>
+      <Button variant={"primary"} className=" border-green-300" onClick={()=> handleMissionRoute('/update/video')}>Video Mission</Button>
+      <Button variant={"primary"} className=" border-green-300" onClick={()=> handleMissionRoute('/update/anonymous')}>Anonymous Mission</Button>
+      <Button variant={"primary"} className=" border-green-300" onClick={()=> handleMissionRoute('/update/poster')}>Poster Mission</Button>
+      <Button variant={"primary"} className=" border-green-300" onClick={()=> handleMissionRoute('/update/tutorial')}>Tutorial Mission</Button>
+      <Button variant={"primary"} className=" border-green-300" onClick={()=> handleMissionRoute('/update/leadership')}>Leadership Mission</Button>
+      <div className="col-span-2 text-white text-opacity-90 text-lg">Old Missions</div>
       <Button variant={"primary"} className=" border-green-300" onClick={handleNewMission}>New Mission</Button>
       <Button variant={"primary"} className=" border-green-300" onClick={handleNewMissionVideo}>New Mission Video</Button>
       <div></div>

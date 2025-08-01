@@ -4,20 +4,23 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { LayoutGrid, List } from "lucide-react";
+import { LayoutGrid, List, LogOut } from "lucide-react";
 import CurrentMission from "@/app/components/current-mission";
 import CompanyFeed from "@/app/components/company-feed";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Showcase from "@/app/components/showcase";
+import { useAuth } from "@/hooks/useAuth";
 
 const DashboardClient = () => {
   const [feedLayout, setFeedLayout] = useState<"grid" | "list">("grid");
   const searchParams = useSearchParams();
   const initialTab = searchParams.get("tab") || "current-mission";
   const [activeTab, setActiveTab] = useState(initialTab);
+  const { logout, user } = useAuth();
+  const router = useRouter()
 
   return (
-    <div className={` bg-[#1a1a1a]  pb-16 h-full ${activeTab === "current-mission" && " fixed w-screen" } `}>
+    <div className="bg-[#1a1a1a] pb-16 min-h-screen w-full">
       <header className="bg-gradient-custom-primary bg-opacity-10 border-b border-purple-900">
         <div className="">
           <div className="items-center justify-between h-16 grid grid-flow-col px-10">
@@ -35,13 +38,22 @@ const DashboardClient = () => {
                 <TabsTrigger value="company-feed">Company Feed</TabsTrigger>
               </TabsList>
             </Tabs>
-            <div className="flex justify-end ">
+            <div className="flex justify-end items-center gap-4">
               <Button
                 variant="ghost"
+                onClick={()=> router.push('/profile')}
                 className="text-white w-min justify-end p-2 rounded-3xl bg-white bg-opacity-10 hover:bg-opacity-20 "
               >
                 <div className=" h-6 w-6 rounded-full bg-neutral-300"></div>
-                Full User Name
+                {user.userName || 'Full User Name'}
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={logout}
+                className="text-white p-2 rounded-3xl bg-red-600 bg-opacity-20 hover:bg-opacity-40"
+                title="Logout"
+              >
+                <LogOut className="h-4 w-4" />
               </Button>
             </div>
           </div>

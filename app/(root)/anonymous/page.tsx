@@ -149,10 +149,10 @@ const AnonymousReview = () => {
 
             {/* Placeholder and badge */}
 
-            <div className="w-[472px] h-[472px] flex items-center justify-center border-dashed border rounded-[15px]">
-              {/* <MissionBadge /> */}
+            {/* <div className="w-[472px] h-[472px] flex items-center justify-center border-dashed border rounded-[15px]">
+              <MissionBadge mission={''} missionStatus={'incomplete'} />
               <p>Anonymous Badge</p>
-            </div>
+            </div> */}
           </div>
         </section>
 

@@ -231,16 +231,16 @@ const sampleQuestions = [
     userAnswer: "",
     isRequired: true,
     matchingtems: [
-      { id: "1", imageUrl: "/images/cat.jpg", altText: "Cat", caption: "Cat", matchPosition: 2},
-      { id: "2", imageUrl: "/images/fish.jpg", altText: "Fish", caption: "Fish", matchPosition: 1},
-      { id: "3", imageUrl: "/images/bird.jpg", altText: "Bird", caption: "Bird", matchPosition: 3},
-      { id: "4", imageUrl: "/images/snake.jpg", altText: "Snake", caption: "Snake", matchPosition: 4}
+      { id: "1", imageUrl: "/images/cat.jpg", altText: "Cat", caption: "Cat",},
+      { id: "2", imageUrl: "/images/fish.jpg", altText: "Fish", caption: "Fish"},
+      { id: "3", imageUrl: "/images/bird.jpg", altText: "Bird", caption: "Bird",},
+      { id: "4", imageUrl: "/images/snake.jpg", altText: "Snake", caption: "Snake"}
     ],
     options: [
-      { id: "1", text: "JavaScript", matchPosition: 1 },
-      { id: "2", text: "Python", matchPosition: 4 },
-      { id: "3", text: "HTML", matchPosition: 2 },
-      { id: "4", text: "Java", matchPosition: 3 },
+      { id: "4", text: "Snake"},
+      { id: "2", text: "Fish",},
+      { id: "1", text: "Cat" },
+      { id: "3", text: "Bird"},
     ],
   },
 
@@ -840,10 +840,6 @@ export const missionsDummy = [
       "Ad-hoc organizational change",
     ],
     questions: sampleQuestions,
-    report: {
-      email: "test@email.com",
-      reportTypeId: 1,
-    },
     rewards: [
       {
         sequence: 0,
@@ -856,12 +852,6 @@ export const missionsDummy = [
             fileName: "@/public/assets/badges/standard.svg",
           },
         ],
-      },
-    ],
-    typeSpecificInfo: [
-      {
-        name: "string",
-        value: "string",
       },
     ],
     workspaceId: 1,

@@ -782,7 +782,7 @@ const MissionVideoQuestions = ({
           <Button
             onClick={handleNextPage}
             variant="default"
-                          className="w-[250px] h-[50px] border-[1.5px] border-[#B276FF] rounded-md flex items-center text-[#6C50E0] font-bold justify-center gap-2 bg-gradient-to-t from-[#EDDDFF] to-[#FCFAFF]"
+                          className="w-[250px] h-[50px]  rounded-md flex items-center text-[#6C50E0] font-bold justify-center gap-2 bg-gradient-to-t from-[#EDDDFF] to-[#FCFAFF]"
 
           >
             Next 
@@ -791,7 +791,7 @@ const MissionVideoQuestions = ({
           <Button
             onClick={handleSubmit}
             variant="default"
-                          className="w-[250px] h-[50px] border border-[#B276FF] rounded-md flex items-center text-[#6C50E0] font-bold justify-center gap-2 bg-gradient-to-t from-[#EDDDFF] to-[#FCFAFF]"
+                          className="w-[250px] h-[50px]  rounded-md flex items-center text-[#6C50E0] font-bold justify-center gap-2 bg-gradient-to-t from-[#EDDDFF] to-[#FCFAFF]"
 
           >
             Submit <Mouse />

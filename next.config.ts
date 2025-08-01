@@ -2,14 +2,20 @@ import { withNextVideo } from "next-video/process";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone", // Required for Azure Web Apps
+  output: "standalone",
   images: {
-    domains: ["*"], // Replace with your production domain
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'spacce-dev-store.s3.eu-west-1.amazonaws.com',
+        pathname: '/**',
+      },
+    ],
   },
   webpack: (config) => {
     config.module.rules.push({
       test: /\.node$/,
-      use: "file-loader", // Replace raw-loader with file-loader
+      use: "file-loader",
     });
     return config;
   },
@@ -24,7 +30,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Cross-Origin-Embedder-Policy",
-            value: "require-corp",
+            value: "unsafe-none", // 🔧 RELAXED to avoid blocking
           },
         ],
       },

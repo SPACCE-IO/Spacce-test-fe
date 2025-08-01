@@ -2,10 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
-
 body {
   overflow-x: hidden;
-  
+}
+
+/* Page transition styles */
+.page-transition-wrapper {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Ensure pages don't overlay */
+.page-transition-wrapper > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Reset any fixed positioning issues */
+.page-transition-wrapper .fixed {
+  position: fixed !important;
+  z-index: 50;
 }
 
 .sectionscroll {
@@ -15,12 +32,10 @@ body {
   overflow-y: scroll;
 }
 
-
 .sectionsnap {
   height: 100vh;
   scroll-snap-align: start;
 }
-
 
 .perspective {
   perspective: 300px;
@@ -90,7 +105,6 @@ body {
     0 0 50px 30px #5C1299,
     0 0 80px 60px #C392FF
 }
-
 
 }
 @layer base {

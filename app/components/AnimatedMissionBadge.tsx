@@ -110,7 +110,7 @@ const AnimatedMissionBadge: React.FC<AnimatedMissionBadgeProps> = ({
 
   return (
     <div ref={badgeRef} className="fixed z-50 pointer-events-none" style={{ top: "50%", left: "50%" }}>
-      <MissionBadge mission={mission} missionStatus={missionStatus} width={400} height={447.22} />
+      <MissionBadge mission={mission} missionStatus={missionStatus} width={300} height={447.22} />
     </div>
   )
 }

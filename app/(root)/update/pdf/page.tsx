@@ -12,9 +12,10 @@ import StartSection from "@/app/components/start-section";
 import TaskPaginationSection from "@/app/components/TaskPaginationSection";
 import TitleTopSectionV2 from "@/app/components/TitleTop-v2";
 import { Button } from "@/components/ui/button";
-import MissionInstruction from "@/app/components/mission-instruction";
-import MissionVideoQuestions, { sampleQuestions1 } from "@/app/components/mission-video-questions";
+// import MissionInstruction from "@/app/components/mission-instruction";
 import { missionsDummy } from "@/utils/question-types";
+import PdfPerspectiveView from "@/app/components/pdf-perspective-view";
+import PDFMissionQuestions from "./PDFMissionQuestions";
 
 const MissionPdf = () => {
   const [activeSection, setActiveSection] = useState<number>(0);
@@ -34,12 +35,12 @@ const MissionPdf = () => {
     // Handle the submission logic here
   };
   const mission = missionsDummy[5];
-console.log("Mission:", mission);
+
   const handleClick = () => {
     router.push("/dashboard?tab=current-mission");
   };
 
-  function getFileByFileName(files:[{ fileName: string,name:string }], fileName: string)  {
+function getFileByFileName(files: { fileName: string; name: string }[], fileName: string) {
   return files?.find(file => file.fileName === fileName) || null;
 }
 
@@ -196,7 +197,7 @@ console.log("Mission:", mission);
                 <div className="flex justify-center items-center">
                   <Button
                     variant={"default"}
-              className="w-[250px] h-[50px] border-[1.5px] border-[#B276FF] rounded-md flex items-center text-[#6C50E0] font-bold justify-center gap-2 bg-gradient-to-t from-[#EDDDFF] to-[#FCFAFF]"
+                    className="w-[250px] h-[50px]  rounded-md flex items-center text-[#6C50E0] font-bold justify-center gap-2 bg-gradient-to-t from-[#EDDDFF] to-[#FCFAFF]"
                     onClick={() => handleButtonScroll(section2Ref)}
                   >
                     See introduction <Mouse />
@@ -228,8 +229,8 @@ console.log("Mission:", mission);
                 See instructions <Mouse />
               </Button>
             </p>
-            <div className="flex justify-center items-center border border-dashed border-black bg-neutral-100 aspect-square h-[320px] rounded-[15px]">
-              Meet a Legend Badge
+            <div className="flex justify-center items-center w-full rounded-[15px] overflow-hidden relative">
+              <PdfPerspectiveView pdfSrc="/dummy.pdf" />
             </div>
           </div>
         </div>
@@ -237,17 +238,17 @@ console.log("Mission:", mission);
         <div ref={section3Ref} className="snap-start h-screen">
           <MissionInstruction
             missionName={mission.missionName}
-            title=""
+            title={mission.description}
             missionInstruction={mission.instruction}
             handleButtonScroll={() => handleButtonScroll(section4Ref)}
           />
         </div>
         <div ref={section4Ref} className="snap-start h-screen">
-          <MissionVideoQuestions
+          <PDFMissionQuestions
             questions={mission.questions}
             onSubmit={handleMissionSubmit}
-            missionType={mission.missionType.name}
-            fileUrl={getFileByFileName(mission.documents,'MISSION_PDF').name}
+            missionType={mission.missionType.missionType}
+            fileUrl={getFileByFileName(mission.documents, 'MISSION_PDF')?.name ?? ""}
           />
         </div>
       </div>
@@ -257,3 +258,47 @@ console.log("Mission:", mission);
 
 export default MissionPdf;
 
+interface MissionSearchProps {
+  title: string,
+  missionInstruction: string,
+  missionName: string,
+  children?: React.ReactNode
+  handleButtonScroll?: ( ) => void
+}
+
+
+const MissionInstruction = ( { title,handleButtonScroll, missionInstruction, missionName, children }: MissionSearchProps ) => {
+
+  return (
+    <section className="relative min-h-screen justify-center -my-6 flex flex-col p-5 mx-auto container ">
+    {/* <div className="flex flex-col gap-10 items-start align-top justify-start ">
+      <p className=" text-black opacity-30" >Mission Name: {missionName}</p>
+      <h2 className=" text-black opacity-30 text-[36px] font-semibold py-5">
+        {title}
+      </h2>
+    </div> */}
+    {children}
+
+    <div className="grid grid-cols-5 mb-10 gap-10 text-2xl font-light">
+      <div className="col-span-4">
+      <div className='grid grid-cols-6'>
+        <p className='col-span-6'>
+            {missionInstruction}
+        </p>
+        </div>
+
+
+      </div>
+    </div>
+        <div className="flex absolute bottom-28 w-full mx-auto  justify-center items-center ">
+                  <Button
+                    variant={"default"}
+              className="w-[250px] h-[50px] rounded-md flex items-center text-white font-bold justify-center gap-2 bg-gradient-to-t from-[#B276FF] to-[#7C2BDA]"
+                    onClick={handleButtonScroll}
+                  >
+                    Start Mission <Mouse />
+                  </Button>
+                </div>
+  </section>
+  )
+}
