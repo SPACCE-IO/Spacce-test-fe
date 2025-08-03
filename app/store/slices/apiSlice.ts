@@ -3,6 +3,9 @@ import {
   createApi,
   FetchBaseQueryError,
 } from "@reduxjs/toolkit/query/react";
+import { useAuth } from "@/hooks/useAuth";
+
+
 
 // Define types for API responses
 interface ApiResponse {
@@ -40,9 +43,21 @@ const baseQueryWithStandardizedErrors = async (
   extraOptions: any
 ): Promise<{ data?: any; error?: StandardizedError }> => {
   const result = (await baseQuery(args, api, extraOptions)) as QueryResult;
+  const { logout } = useAuth();
 
   // Handle HTTP-level errors (status codes >= 400)
   if (result.error) {
+
+    if(result.error.data?.error === "Invalid token"){
+      logout();
+      return {
+        error: {
+          status: 401,
+          message: "Session expired. Please log in again.",
+        },
+      };
+    }
+
     return {
       error: {
         status: (result.error.status as number) || 500,

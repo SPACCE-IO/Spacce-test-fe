@@ -308,7 +308,7 @@ const pdf = {
     "reportTypeId": 2
   },
   "typeSpecificInfo": [],
-  "workspaceId": 3,
+  "workspaceId": 1,
   "rewards": [
     {
       "sequence": 1,
@@ -474,7 +474,7 @@ const video = {
     "reportTypeId": 2
   },
   "typeSpecificInfo": [],
-  "workspaceId": 3,
+  "workspaceId": 1,
   "rewards": [
     {
       "sequence": 1,
@@ -636,7 +636,7 @@ const anonymous = {
     "reportTypeId": 2
   },
   "typeSpecificInfo": [],
-  "workspaceId": 3,
+  "workspaceId": 1,
   "rewards": [
     {
       "sequence": 1,
@@ -798,7 +798,7 @@ const appreciation = {
     "reportTypeId": 2
   },
   "typeSpecificInfo": [],
-  "workspaceId": 3,
+  "workspaceId": 1,
   "rewards": [
     {
       "sequence": 1,
@@ -881,7 +881,7 @@ const poster = {
     "reportTypeId": 2
   },
   "typeSpecificInfo": [],
-  "workspaceId": 3,
+  "workspaceId": 1,
   "rewards": [
     {
       "sequence": 1,

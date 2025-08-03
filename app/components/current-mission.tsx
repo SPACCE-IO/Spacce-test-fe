@@ -324,13 +324,13 @@ export default function CurrentMission() {
                 triggerAnimation={selectedMission?.id} // Pass the selected mission ID as the trigger
               >
                 {/* Show reward image if available, otherwise show badge */}
-                {!selectedMission.rewardUrl ? (
+                {selectedMission.rewardUrl ? (
                   <img
-                    src={selectedMission.rewardUrl}
+                    src={'https://spacce-dev-store.s3.eu-west-1.amazonaws.com/test/workspace/1/group/4/pdfDone.svg'}
                     alt={`Reward for ${selectedMission.title}`}
                     height={400}
                     width={400}
-                    className="badge-gradient rounded-full object-cover"
+                    className="badge-gradient rounded-full"
                   />
                 ) : (
                   <Image
