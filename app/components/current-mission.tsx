@@ -103,7 +103,6 @@ const truncateWithEllipsis = (str: string, maxLength: number = 40): string => {
   return str.length > maxLength ? str.slice(0, maxLength) + '...' : str;
 }
 
-
 // Convert API status to our status format
 const convertStatus = (apiStatus: string): "completed" | "active" | "incomplete" => {
   switch (apiStatus) {
@@ -115,6 +114,33 @@ const convertStatus = (apiStatus: string): "completed" | "active" | "incomplete"
     default:
       return "incomplete"
   }
+}
+
+// Helper function to determine the default selected mission based on priority
+const getDefaultSelectedMission = (missions: Mission[]): Mission | null => {
+  if (missions.length === 0) return null
+  
+  // Priority 1: Find active mission
+  const activeMission = missions.find(mission => mission.status === "active")
+  console.log("Active Mission:", activeMission)
+  if (activeMission) return activeMission
+  
+  // Priority 2: Find next incomplete mission (lowest sequence number among incomplete)
+  const incompleteMissions = missions
+    .filter(mission => mission.status === "incomplete")
+    .sort((a, b) => a.sequence - b.sequence)
+  console.log("Incomplete Missions:", incompleteMissions)
+  if (incompleteMissions.length > 0) return incompleteMissions[0]
+  
+  // Priority 3: Show last completed mission (highest sequence number among completed)
+  const completedMissions = missions
+    .filter(mission => mission.status === "completed")
+    .sort((a, b) => b.sequence - a.sequence) // Sort descending for highest sequence first
+  console.log("Completed Missions:", completedMissions)
+  if (completedMissions.length > 0) return completedMissions[0]
+  
+  // Fallback: return first mission if none match the criteria above
+  return missions[0]
 }
 
 export default function CurrentMission() {
@@ -172,9 +198,9 @@ export default function CurrentMission() {
 
       setMissions(convertedMissions)
 
-      // Set default selected mission (first active or first mission)
-      const activeMission = convertedMissions.find((mission) => mission.status === "active")
-      setSelectedMission(activeMission || convertedMissions[0])
+      // Set default selected mission using priority logic
+      const defaultMission = getDefaultSelectedMission(convertedMissions)
+      setSelectedMission(defaultMission)
     }
   }, [isSuccess, data])
 
@@ -324,25 +350,13 @@ export default function CurrentMission() {
                 triggerAnimation={selectedMission?.id} // Pass the selected mission ID as the trigger
               >
                 {/* Show reward image if available, otherwise show badge */}
-                {selectedMission.rewardUrl ? (
+                {selectedMission.rewardUrl && (
                   <img
-                    src={'https://spacce-dev-store.s3.eu-west-1.amazonaws.com/test/workspace/1/group/4/pdfDone.svg'}
+                    src={selectedMission.rewardUrl}
                     alt={`Reward for ${selectedMission.title}`}
                     height={400}
                     width={400}
                     className="badge-gradient rounded-full"
-                  />
-                ) : (
-                  <Image
-                    src={
-                      selectedMission.isCompleted || selectedMission.status === "active"
-                        ? selectedMission.badge.completed
-                        : selectedMission.badge.incomplete
-                    }
-                    alt={`Badge for ${selectedMission.title}`}
-                    height={400}
-                    width={400}
-                    className="badge-gradient"
                   />
                 )}
               </AnimatedBadge>

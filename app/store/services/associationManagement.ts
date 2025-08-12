@@ -5,7 +5,8 @@ interface Group {
   id: number;
   name: string;
 }
-const devBaseUrl = 'http://localhost:3001'
+// const devBaseUrl = 'http://localhost:3001'
+const devBaseUrl = 'https://dev-spacce.spacce.io'
 export const associationApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getGroupById: builder.query({

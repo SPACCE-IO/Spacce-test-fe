@@ -1,10 +1,10 @@
 import PdfPerspectiveView from '@/app/components/pdf-perspective-view'
 import React from 'react'
 
-const PDFIntro = () => {
+const PdfIntro = () => {
   return (
     <PdfPerspectiveView pdfSrc="/dummy.pdf" />
   )
 }
 
-export default PDFIntro
+export default PdfIntro

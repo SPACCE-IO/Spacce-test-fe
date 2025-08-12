@@ -9,10 +9,9 @@ import StartSection from "@/app/components/start-section";
 import { Button } from "@/components/ui/button";
 import { useLogResponseMutation } from "@/app/store/services/missionManagement";
 import { getAuthToken } from "@/utils/auth";
-import StandardQuestions from "./standard-mission-questions";
-import StandardIntro from "./StandardIntro";
 import { FaCaretDown, FaCaretUp } from "react-icons/fa";
-
+import PdfIntro from "./pdf-intro";
+import PdfQuestions from "./pdf-questions";
 // Define interfaces based on your API response
 interface MissionDocument {
   name: string;
@@ -94,7 +93,7 @@ interface StandardMissionComponentProps {
   mission: MissionProps;
 }
 
-const StandardMission = ({ mission }: StandardMissionComponentProps) => {
+const PdfMission = ({ mission }: StandardMissionComponentProps) => {
   const [activeSection, setActiveSection] = useState<number>(0);
   const totalSteps = 4;
   const containerRef = useRef<HTMLDivElement>(null!);
@@ -297,7 +296,7 @@ const StandardMission = ({ mission }: StandardMissionComponentProps) => {
               </Button>
             </p>
             <div className="flex justify-center items-center w-full rounded-[15px] overflow-hidden relative">
-              <StandardIntro />
+              <PdfIntro />
             </div>
           </div>
         </div>
@@ -311,11 +310,12 @@ const StandardMission = ({ mission }: StandardMissionComponentProps) => {
           />
         </div>
         <div ref={section4Ref} className="snap-start h-screen">
-          <StandardQuestions
+          <PdfQuestions
             questions={mission.questions}
-            onSubmit={handleMissionSubmit}
-            // onQuestionSubmit={handleQuestionSubmit}
             missionType={mission.type}
+            missionFile={'/dummy.pdf'}
+            missionId={mission.id}
+            isMissionComplete={isMissionComplete}
           />
         </div>
       </div>
@@ -323,7 +323,7 @@ const StandardMission = ({ mission }: StandardMissionComponentProps) => {
   );
 };
 
-export default StandardMission;
+export default PdfMission;
 
 interface MissionSearchProps {
   title: string,

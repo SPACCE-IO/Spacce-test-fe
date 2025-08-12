@@ -148,7 +148,7 @@ export default function ForgotPasswordPage() {
 
       {/* Main Content */}
       <main className="flex-1 flex items-center justify-center p-6">
-        <Card className="max-w-md bg-black bg-opacity-10 border border-neutral-700 rounded-[16px] h-[600px] w-[580px]">
+        <Card className="max-w-md bg-black bg-opacity-10 border border-neutral-700 rounded-[16px] w-[580px]">
           <CardContent className="p-6">
             <div className="flex justify-center mb-6">
               <div className="bg-gray-800 rounded-full p-4">

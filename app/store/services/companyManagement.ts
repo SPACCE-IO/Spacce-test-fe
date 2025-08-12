@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { apiSlice } from "../slices/apiSlice";
-const devBaseUrl = 'http://localhost:3002'
+// const devBaseUrl = 'http://localhost:3002'
+const devBaseUrl = 'https://dev-spacce.spacce.io'
 
 export const companyApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

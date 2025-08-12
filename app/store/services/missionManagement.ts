@@ -1,7 +1,8 @@
 // @ts-nocheck
 
 import { apiSlice } from "../slices/apiSlice";
-const devBaseUrl = 'http://localhost:3004'
+// const devBaseUrl = 'http://localhost:3004'
+const devBaseUrl = "https://dev-spacce.spacce.io"
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -22,6 +23,7 @@ export const authApi = apiSlice.injectEndpoints({
         method: "GET",
         headers: { Authorization: authToken },
       }),
+      providesTags: [],
     }),
     getGlobalMissionById: builder.query({
       query: ({ authToken, id }) => ({
@@ -29,6 +31,7 @@ export const authApi = apiSlice.injectEndpoints({
         method: "GET",
         headers: { Authorization: authToken },
       }),
+      providesTags: [],
     }),
     addMission: builder.mutation({
       query: ({ body, authToken }) => ({
@@ -40,6 +43,7 @@ export const authApi = apiSlice.injectEndpoints({
         },
         formData: true,
       }),
+      invalidatesTags: [],
     }),
     updateMission: builder.mutation({
       query: ({ body, id, authToken }) => ({
@@ -48,6 +52,7 @@ export const authApi = apiSlice.injectEndpoints({
         body,
         headers: { Authorization: authToken },
       }),
+      invalidatesTags: [],
     }),
     getMissionById: builder.query({
       query: ({ id, authToken }) => ({
@@ -55,6 +60,7 @@ export const authApi = apiSlice.injectEndpoints({
         method: "GET",
         headers: { Authorization: authToken },
       }),
+      providesTags: ['missionById'],
     }),
     getMissionSummary: builder.query({
       query: (authToken) => ({
@@ -62,6 +68,7 @@ export const authApi = apiSlice.injectEndpoints({
         method: "GET",
         headers: { Authorization: authToken },
       }),
+      providesTags: [],
     }),
     getTagByType: builder.query({
       query: ({ body, type, authToken }) => ({
@@ -70,6 +77,7 @@ export const authApi = apiSlice.injectEndpoints({
         body,
         headers: { Authorization: authToken },
       }),
+      providesTags: [],
     }),
     cloneMission: builder.mutation({
       query: ({ body, id, authToken }) => ({
@@ -78,6 +86,7 @@ export const authApi = apiSlice.injectEndpoints({
         body,
         headers: { Authorization: authToken },
       }),
+      invalidatesTags: [],
     }),
     importGlobalMission: builder.mutation({
       query: ({ authToken, body }) => ({
@@ -90,10 +99,11 @@ export const authApi = apiSlice.injectEndpoints({
     logResponse: builder.mutation({
       query: ({ authToken, body, id }) => ({
         url: `${devBaseUrl}/mission/api/v1/mission/${id}`,
-        method: "POST",
+        method: "PATCH",
         body,
         headers: { Authorization: authToken },
       }),
+      invalidatesTags: ['missionById'],
     }),
   }),
 });

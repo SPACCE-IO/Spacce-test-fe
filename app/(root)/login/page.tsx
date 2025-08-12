@@ -27,7 +27,8 @@ export default function LoginPage() {
 
   const [userLogin, userLoginProps] = useUserLoginMutation()
   const [getProfile, getProfileProps] = useLazyGetProfileQuery()
-
+console.log("LoginPage rendered",userLoginProps)
+console.log("Profile rendered", getProfileProps)
   const router = useRouter()
   const searchParams = useSearchParams()
   const dispatch = useDispatch()
@@ -81,7 +82,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (getProfileProps.isSuccess && getProfileProps.data) {
       const profileData = getProfileProps.data
-      
+      console.log("profileData", profileData)
       // Store profile data in Redux
       dispatch(setProfile(profileData))
       
@@ -89,7 +90,6 @@ export default function LoginPage() {
       // For now, setting basic user info - you may need to decode JWT token for userId, role etc.
       dispatch(setUser({
         userName: profileData.userName,
-        userId: null, // Extract from token if needed
         role: "R", // Extract from token if needed
         orgCode: orgCode, // Use the orgCode from form
       }))
@@ -146,7 +146,7 @@ export default function LoginPage() {
 
       {/* Main Content */}
       <main className="flex-1 flex items-center justify-center p-6">
-                <Card className=" max-w-md bg-black bg-opacity-10 border border-neutral-700 rounded-[16px] h-[650px] w-[580px]">
+                <Card className=" max-w-md bg-black bg-opacity-10 border border-neutral-700 rounded-[16px] w-[580px]">
                 <CardContent className="p-6">
                     
                  

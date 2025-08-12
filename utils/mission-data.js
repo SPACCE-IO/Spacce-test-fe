@@ -142,7 +142,7 @@ const standard = {
     "reportTypeId": 2
   },
   "typeSpecificInfo": [],
-  "workspaceId": 3,
+  "workspaceId": 1,
   "rewards": [
     {
       "sequence": 1,

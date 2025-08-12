@@ -2,13 +2,15 @@
 
 import React, { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation';
-import { useLazyGetMissionByIdQuery } from '@/app/store/services/missionManagement';
+import { useGetMissionByIdQuery, useLazyGetMissionByIdQuery } from '@/app/store/services/missionManagement';
 import { getAuthToken } from '@/utils/auth';
-import StandardMission from '../standard-mission';
-import TutorialMission from '../tutorial-mission';
-import PosterMission from '../poster-mission';
-import VideoMission from '../video-mission';
-import AnonymousMission from '../anonymous-mission';
+import TutorialMission from '../tutorial/tutorial-mission';
+import PosterMission from '../poster/poster-mission';
+import VideoMission from '../video/video-mission';
+import AnonymousMission from '../anonymous/anonymous-mission';
+import StandardMission from '../standard/standard-mission';
+import AppreciationMission from '../appreciation/appreciation-mission';
+import PdfMission from '../pdf/pdf-mission';
 
 // Define the mission data structure based on your API response
 interface MissionQuestion {
@@ -125,29 +127,11 @@ const MissionNotFound = () => (
 const Mission = () => {
   const router = useRouter();
   const params = useParams();
-  const [getMissionById, getMissionByIdProps] = useLazyGetMissionByIdQuery();
+  const missionId = params?.id || params?.missionId;
   const [missionData, setMissionData] = useState<MissionData | null>(null);
   const token = getAuthToken();
-
-  // Extract mission ID from URL params
-  const missionId = params?.id || params?.missionId;
-
-  useEffect(() => {
-    // Redirect to login if no token
-    if (!token) {
-      router.push('/login');
-      return;
-    }
-
-    // Fetch mission if we have an ID
-    if (missionId) {
-      const numericId = typeof missionId === 'string' ? parseInt(missionId, 10) : missionId;
-      if (!isNaN(numericId)) {
-        getMissionById({ id: numericId, authToken: token });
-      }
-    }
-  }, [missionId, token, getMissionById, router]);
-
+  const getMissionByIdProps = useGetMissionByIdQuery({ id: missionId, authToken: token });
+  
   // Handle API response
   useEffect(() => {
     if (getMissionByIdProps.isSuccess && getMissionByIdProps.data) {
@@ -155,16 +139,7 @@ const Mission = () => {
     }
   }, [getMissionByIdProps.isSuccess, getMissionByIdProps.data]);
 
-  // Handle retry
-  const handleRetry = () => {
-    if (missionId) {
-      const numericId = typeof missionId === 'string' ? parseInt(missionId, 10) : missionId;
-      if (!isNaN(numericId)) {
-        getMissionById({ id: numericId, authToken: token });
-      }
-    }
-  };
-
+ 
   // Show loading state
   if (getMissionByIdProps.isLoading) {
     return <LoadingMission />;
@@ -178,7 +153,7 @@ const Mission = () => {
         : 'An unexpected error occurred'
       : 'Failed to fetch mission data';
     
-    return <ErrorMission error={errorMessage} onRetry={handleRetry} />;
+    return <ErrorMission error={errorMessage} onRetry={()=> console.log("refresh")} />;
   }
 
   // Show not found if no mission data
@@ -204,10 +179,10 @@ const Mission = () => {
       return <StandardMission mission={missionData} />;
     
     case "PDF_MISSION":
-      return <StandardMission mission={missionData} />;
+      return <PdfMission mission={missionData} />;
     
     case "APPRECIATION_MISSION":
-      return <StandardMission mission={missionData} />;
+      return <AppreciationMission mission={missionData} />;
     
     case "VIDEO_MISSION":
       return <VideoMission mission={missionData} />;

@@ -212,6 +212,7 @@ const TwoMinuteAppreciation = () => {
             {/* Placeholder and badge */}
             {/* <div className="flex justify-center items-center border border-dashed border-black bg-neutral-100 w-[1312px] h-[472px] rounded-[15px]"></div>
              */}
+
             <div className="flex justify-center items-center w-full max-w-[1312px] h-[472px] rounded-[15px] overflow-hidden -top-14 relative">
               <div className="grid grid-cols-5">
                 {profiles.map((profile, index) => (

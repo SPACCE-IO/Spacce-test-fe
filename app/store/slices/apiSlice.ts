@@ -43,31 +43,31 @@ const baseQueryWithStandardizedErrors = async (
   extraOptions: any
 ): Promise<{ data?: any; error?: StandardizedError }> => {
   const result = (await baseQuery(args, api, extraOptions)) as QueryResult;
-  const { logout } = useAuth();
+  // const { logout } = useAuth();
 
-  // Handle HTTP-level errors (status codes >= 400)
-  if (result.error) {
+  // // Handle HTTP-level errors (status codes >= 400)
+  // if (result.error) {
 
-    if(result.error.data?.error === "Invalid token"){
-      logout();
-      return {
-        error: {
-          status: 401,
-          message: "Session expired. Please log in again.",
-        },
-      };
-    }
+  //   if(result.error.data?.error === "Invalid token"){
+  //     logout();
+  //     return {
+  //       error: {
+  //         status: 401,
+  //         message: "Session expired. Please log in again.",
+  //       },
+  //     };
+  //   }
 
-    return {
-      error: {
-        status: (result.error.status as number) || 500,
-        message:
-          (result.error.data as ApiResponse)?.message ||
-          (result.error.data as ApiResponse)?.error ||
-          "An unexpected error occurred.",
-      },
-    };
-  }
+  //   return {
+  //     error: {
+  //       status: (result.error.status as number) || 500,
+  //       message:
+  //         (result.error.data as ApiResponse)?.message ||
+  //         (result.error.data as ApiResponse)?.error ||
+  //         "An unexpected error occurred.",
+  //     },
+  //   };
+  // }
 
   // Handle API-level errors ONLY if there's an error field
   // or if the status code indicates an error

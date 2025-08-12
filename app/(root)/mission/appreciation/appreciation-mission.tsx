@@ -9,10 +9,9 @@ import StartSection from "@/app/components/start-section";
 import { Button } from "@/components/ui/button";
 import { useLogResponseMutation } from "@/app/store/services/missionManagement";
 import { getAuthToken } from "@/utils/auth";
-import StandardQuestions from "./standard-mission-questions";
-import StandardIntro from "./StandardIntro";
 import { FaCaretDown, FaCaretUp } from "react-icons/fa";
-import PDFIntro from "./PDFIntro";
+import AppreciationIntro from "./appreciation-intro";
+import AppreciationQuestions from "./appreciation-questions";
 
 // Define interfaces based on your API response
 interface MissionDocument {
@@ -91,11 +90,11 @@ interface MissionProps {
   rewards: any[];
 }
 
-interface StandardMissionComponentProps {
+interface AppreciationMissionComponentProps {
   mission: MissionProps;
 }
 
-const PDFMission = ({ mission }: StandardMissionComponentProps) => {
+const AppreciationMission = ({ mission }: AppreciationMissionComponentProps) => {
   const [activeSection, setActiveSection] = useState<number>(0);
   const totalSteps = 4;
   const containerRef = useRef<HTMLDivElement>(null!);
@@ -216,6 +215,7 @@ const PDFMission = ({ mission }: StandardMissionComponentProps) => {
     }
   };
 
+  console.log("Mission Data:", mission);
 
 
 
@@ -298,7 +298,7 @@ const PDFMission = ({ mission }: StandardMissionComponentProps) => {
               </Button>
             </p>
             <div className="flex justify-center items-center w-full rounded-[15px] overflow-hidden relative">
-              <PDFIntro />
+              <AppreciationIntro />
             </div>
           </div>
         </div>
@@ -312,7 +312,7 @@ const PDFMission = ({ mission }: StandardMissionComponentProps) => {
           />
         </div>
         <div ref={section4Ref} className="snap-start h-screen">
-          <StandardQuestions
+          <AppreciationQuestions
             questions={mission.questions}
             onSubmit={handleMissionSubmit}
             // onQuestionSubmit={handleQuestionSubmit}
@@ -324,7 +324,7 @@ const PDFMission = ({ mission }: StandardMissionComponentProps) => {
   );
 };
 
-export default PDFMission;
+export default AppreciationMission;
 
 interface MissionSearchProps {
   title: string,
@@ -386,7 +386,6 @@ const TaskPaginationSection: React.FC<TaskPaginationSectionProps> = ({
   onScrollUp, 
   onScrollDown
 }) => {
-  console.log("TaskPaginationSection rendered with title:", title, "totalSteps:", totalSteps, "currentStep:", currentStep);
   return (
     <div className="right-0 z-10 fixed h-[90vh] w-[122px] pt-10 pb-[60px] pr-[32px] bg-center bg-no-repeat bg-fixed bg-opacity-50">
       <p
