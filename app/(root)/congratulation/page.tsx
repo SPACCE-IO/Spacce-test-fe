@@ -1,7 +1,7 @@
 'use client'
 
-import EndSectionGradient from '@/app/components/end-section-gradient'
-import MissionBadge from '@/app/components/mission-badge'
+import EndSectionGradient from '@/components/end-section-gradient'
+import MissionBadge from '@/components/mission-badge'
 import { Button } from '@/components/ui/button'
 import { Mouse } from 'lucide-react'
 import { useRouter } from 'next/navigation'
