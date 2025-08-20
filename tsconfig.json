@@ -23,6 +23,13 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["video.d.ts", "next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "utils/db-update-for"],
+  "include": [
+    "video.d.ts",
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "src/utils/db-update-for"
+  ],
   "exclude": ["node_modules"]
 }
