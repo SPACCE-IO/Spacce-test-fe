@@ -30,11 +30,11 @@ export const MultipleChoiceQuestion: React.FC<MultipleChoiceQuestionProps> = ({
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-6">
       {options?.map((option) => (
         <label
           key={option.id}
-          className={`flex items-center space-x-2 cursor-pointer ${
+          className={`flex items-center text-base space-x-2 cursor-pointer ${
             isAnsweredCorrectly ? "opacity-60" : ""
           }`}
         >

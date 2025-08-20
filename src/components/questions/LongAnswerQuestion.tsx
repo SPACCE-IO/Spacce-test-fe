@@ -18,9 +18,7 @@ export const LongAnswerQuestion: React.FC<LongAnswerQuestionProps> = ({
   return (
     <div>
       <textarea
-        className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-          isAnsweredCorrectly ? "bg-green-50 border-green-300" : ""
-        }`}
+        className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
         rows={4}
         value={value || ""}
         onChange={(e) => onChange(e.target.value)}

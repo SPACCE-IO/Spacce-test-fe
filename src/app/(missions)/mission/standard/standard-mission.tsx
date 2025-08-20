@@ -102,8 +102,6 @@ const StandardMission = ({ mission }: StandardMissionComponentProps) => {
   const section3Ref = useRef<HTMLDivElement>(null!);
   const section4Ref = useRef<HTMLDivElement>(null!);
   const section5Ref = useRef<HTMLDivElement>(null!);
-  const router = useRouter();
-  const token = getAuthToken();
 
   // Check if mission is complete based on status
   const isMissionComplete = mission?.status === 2 || mission?.status === 1;

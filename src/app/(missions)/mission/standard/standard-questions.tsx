@@ -91,6 +91,7 @@ const StandardQuestions = ({
   const [questionStatuses, setQuestionStatuses] = useState<{
     [key: number]: number;
   }>({});
+  console.log("user answers",answers)
   const [showHintId, setShowHintId] = useState<number | null>(null);
   const [validationErrors, setValidationErrors] = useState<{
     [key: number]: string;
@@ -187,8 +188,6 @@ const StandardQuestions = ({
         answer: answer ? answer.trim() : "",
       };
 
-      console.log("Submitting answer:", payload);
-
       const response = await logResponse({
         authToken: session?.accessToken,
         body: payload,
@@ -273,15 +272,11 @@ const StandardQuestions = ({
     if (allQuestionsCorrect) {
       // All questions correct - mission successful
       setMissionStatus(2);
-      setTimeout(() => {
-        router.push("/congratulation");
-      }, 2000);
+      router.push("/congratulation");
     } else {
       // Some questions incorrect - mission failed
       setMissionStatus(1);
-      setTimeout(() => {
-        router.push("/mission-fail");
-      }, 2000);
+      router.push("/mission-fail");
     }
   };
 

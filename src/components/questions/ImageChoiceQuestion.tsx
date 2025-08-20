@@ -29,7 +29,8 @@ export const ImageChoiceQuestion: React.FC<ImageChoiceQuestionProps> = ({
             }`}
           >
             <img
-              src={option.imageUrl}
+              src={"https://picsum.photos/200/300"}
+              // src={option.imageUrl}
               alt={option.altText}
               className="w-full h-32 object-cover rounded mb-2"
             />
