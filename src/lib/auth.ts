@@ -36,6 +36,14 @@ declare module "next-auth" {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
+// Debug logging
+console.log("NextAuth Config:", {
+  hasSecret: !!process.env.NEXTAUTH_SECRET,
+  hasUrl: !!process.env.NEXTAUTH_URL,
+  hasBaseUrl: !!process.env.NEXT_PUBLIC_BASE_URL,
+  nodeEnv: process.env.NODE_ENV,
+});
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     CredentialsProvider({
@@ -176,5 +184,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     strategy: "jwt",
     maxAge: 60 * 50, // 1 hour
   },
-  secret: process.env.NEXTAUTH_SECRET || "your-secret-key-here",
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === "development",
 });
