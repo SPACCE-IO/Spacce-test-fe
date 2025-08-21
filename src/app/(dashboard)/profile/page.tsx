@@ -71,6 +71,7 @@ const {data:session} = useSession()
   const [updateProfile, updateProfileProps] = useUpdateProfileMutation();
   const [getProfile, getProfileProps] = useLazyGetProfileQuery();
   const router = useRouter();
+  const { status: sessionStatus } = useSession();
 
 
 
@@ -279,9 +280,11 @@ const {data:session} = useSession()
   ];
   const avatars = Array(profilePics.length).fill(null);
 
-    useEffect(() => {
-      getProfile(session?.accessToken);
-    }, [session]);
+      useEffect(() => {
+    if (sessionStatus === "authenticated" && session?.accessToken) {
+      getProfile(session.accessToken);
+    }
+  }, [sessionStatus, session?.accessToken]);
   
 
   return (
