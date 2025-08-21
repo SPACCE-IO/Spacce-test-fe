@@ -1,7 +1,5 @@
 import { handlers } from "@/src/lib/auth";
 
-export const { GET, POST } = handlers;
-
 // Add error handling for debugging
 export async function GET(request: Request) {
   try {
