@@ -125,7 +125,6 @@ const getDefaultSelectedMission = (missions: Mission[]): Mission | null => {
 
   // Priority 1: Find active mission
   const activeMission = missions.find((mission) => mission.status === "active");
-  console.log("Active Mission:", activeMission);
   if (activeMission) return activeMission;
 
   // Priority 2: Find next incomplete mission (lowest sequence number among incomplete)
@@ -162,7 +161,6 @@ export default function CurrentMission() {
 
   const timelineRef = useRef<HTMLDivElement>(null);
   const missionsRef = useRef<(HTMLDivElement | null)[]>([]);
-console.log("session", session?.accessToken);
   const { data, isLoading, isError, isSuccess } = useGetDashboardQuery(session?.accessToken);
 
   const router = useRouter();

@@ -11,6 +11,8 @@ import AppreciationMission from "../appreciation/appreciation-mission";
 import PdfMission from "../pdf/pdf-mission";
 import { useGetMissionByIdQuery, useLazyGetMissionByIdQuery } from "@/src/services/missionManagement";
 import { useSession } from "next-auth/react";
+import { useDispatch } from "react-redux";
+import { setCurrentMission } from "@/src/slices/missionSlice";
 
 // Define the mission data structure based on your API response
 interface MissionQuestion {
@@ -139,7 +141,7 @@ const Mission = () => {
   const missionId = params?.id || params?.missionId;
   const [missionData, setMissionData] = useState<MissionData | null>(null);
   const [getMission,getMissionByIdProps] = useLazyGetMissionByIdQuery();
-
+const dispatch = useDispatch()
   useEffect(() => {
     if(session){
 
@@ -154,6 +156,7 @@ const Mission = () => {
   useEffect(() => {
     if (getMissionByIdProps.isSuccess && getMissionByIdProps.data) {
       setMissionData(getMissionByIdProps.data as MissionData);
+      dispatch(setCurrentMission(getMissionByIdProps.data))
     }
   }, [getMissionByIdProps.isSuccess, getMissionByIdProps.data]);
 

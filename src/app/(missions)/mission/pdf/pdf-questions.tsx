@@ -12,6 +12,7 @@ import {
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import PdfViewer from "@/src/components/PdfViewer";
+import { QuestionRenderer } from "@/src/components/questions/QuestionRenderer";
 import { useSession } from "next-auth/react";
 import { useLogResponseMutation } from "@/src/services/missionManagement";
 
@@ -85,28 +86,25 @@ interface PdfQuestionsProps {
   questions: Question[];
   missionType: string;
   missionId: number;
-  missionFile: string;
   isMissionComplete: boolean;
+  missionFile?: string;
 }
 
 const PdfQuestions = ({
   questions,
   missionType,
   missionId,
-  missionFile,
   isMissionComplete,
+  missionFile,
 }: PdfQuestionsProps) => {
   const router = useRouter();
-  const [activeQuestionId, setActiveQuestionId] = useState<number | null>(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});
   const [questionStatuses, setQuestionStatuses] = useState<{
     [key: number]: number;
   }>({});
   const [showHintId, setShowHintId] = useState<number | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
-  const [draggedItem, setDraggedItem] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState<{ [key: number]: string }>({});
-  const [currentPage, setCurrentPage] = useState<number>(0);
   const [validationErrors, setValidationErrors] = useState<{
     [key: number]: string;
   }>({});
@@ -114,12 +112,10 @@ const PdfQuestions = ({
   const [responseMessage, setResponseMessage] = useState<string>("");
   const [showResponse, setShowResponse] = useState(false);
   const [missionStatus, setMissionStatus] = useState(1);
-  const [imageOrders, setImageOrders] = useState<{ [key: number]: any[] }>({});
   const { data: session } = useSession();
 
   const questionsContainerRef = useRef<HTMLDivElement>(null);
   const [logResponse] = useLogResponseMutation();
-  const QUESTIONS_PER_PAGE = 1;
 
   // Initialize question statuses and answers from props
   useEffect(() => {
@@ -155,14 +151,27 @@ const PdfQuestions = ({
   }
 
   const displayQuestions = questions?.length > 0 ? questions : [];
-  const totalPages = Math.ceil(displayQuestions.length / QUESTIONS_PER_PAGE);
-  const currentQuestions = displayQuestions.slice(
-    currentPage * QUESTIONS_PER_PAGE,
-    (currentPage + 1) * QUESTIONS_PER_PAGE
-  );
+  const currentQuestion = displayQuestions[currentQuestionIndex];
+  const isLastQuestion = currentQuestionIndex === displayQuestions.length - 1;
+
+  // Check if we can proceed to next question
+  const canGoNext =
+    currentQuestion &&
+    (questionStatuses[currentQuestion.id] === 1 || // Already answered correctly
+      !currentQuestion.isRequired || // Not required
+      (answers[currentQuestion.id] &&
+        answers[currentQuestion.id].trim() !== "")); // Has an answer
+
+  // Check if current question is already answered correctly
+  const isCurrentQuestionCorrect = () => {
+    return questionStatuses[currentQuestion?.id] === 1;
+  };
 
   // Submit current answer (only if not already correct)
-  const submitCurrentAnswer = async (questionId: number) => {
+  const submitCurrentAnswer = async () => {
+    if (!currentQuestion) return false;
+
+    const questionId = currentQuestion.id;
     const answer = answers[questionId];
 
     // If question is already answered correctly, don't submit again
@@ -171,8 +180,7 @@ const PdfQuestions = ({
     }
 
     // Validate required questions
-    const question = questions.find((q) => q.id === questionId);
-    if (question?.isRequired && (!answer || answer.trim() === "")) {
+    if (currentQuestion.isRequired && (!answer || answer.trim() === "")) {
       setValidationErrors((prev) => ({
         ...prev,
         [questionId]: "This question is required",
@@ -233,24 +241,6 @@ const PdfQuestions = ({
     }
   };
 
-  const validateCurrentPage = () => {
-    const errors: { [key: number]: string } = {};
-    let hasErrors = false;
-
-    currentQuestions.forEach((question) => {
-      if (question.isRequired && questionStatuses[question.id] !== 1) {
-        const answer = answers[question.id];
-        if (!answer || answer.trim() === "") {
-          errors[question.id] = "This question is required";
-          hasErrors = true;
-        }
-      }
-    });
-
-    setValidationErrors(errors);
-    return !hasErrors;
-  };
-
   // Check mission completion and redirect accordingly
   const checkMissionCompletion = () => {
     const allQuestionsCorrect = questions.every((question) => {
@@ -270,127 +260,70 @@ const PdfQuestions = ({
     }
   };
 
-  const handleNextPage = async () => {
-    if (!validateCurrentPage()) return;
+  // Handle next question
+  const handleNext = async () => {
+    if (!currentQuestion) return;
 
-    // Submit answers for current page questions that haven't been submitted yet
-    const submissionPromises = currentQuestions.map(async (question) => {
-      const questionId = question.id;
-
-      // If question is already answered correctly, skip submission
-      if (questionStatuses[questionId] === 1) {
-        return true;
+    // If question is already answered correctly (status = 1), just move to next
+    if (isCurrentQuestionCorrect()) {
+      if (isLastQuestion) {
+        checkMissionCompletion();
+      } else {
+        // Move to next question without submitting
+        setCurrentQuestionIndex((prev) => prev + 1);
+        setResponseMessage("");
+        setShowResponse(false);
       }
+      return;
+    }
 
-      // If question has an answer and is required or has content, submit it
-      const answer = answers[questionId];
-      if (answer && answer.trim() !== "") {
-        return await submitCurrentAnswer(questionId);
-      }
-
-      // If no answer but required, validation should have caught this
-      return !question.isRequired;
-    });
-
-    const results = await Promise.all(submissionPromises);
-    const allSuccessful = results.every((result) => result);
-
-    if (allSuccessful) {
-      if (currentPage < totalPages - 1) {
-        setCurrentPage(currentPage + 1);
-        setActiveQuestionId(null);
+    // If question is not answered correctly, submit the answer
+    const success = await submitCurrentAnswer();
+    if (success) {
+      if (isLastQuestion) {
+        // Check if all questions are answered correctly
+        checkMissionCompletion();
+      } else {
+        // Move to next question only if submission was successful
+        setCurrentQuestionIndex((prev) => prev + 1);
         setResponseMessage("");
         setShowResponse(false);
       }
     }
   };
 
-  const handlePreviousPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-      setActiveQuestionId(null);
+  // Handle previous question
+  const handlePrevious = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex((prev) => prev - 1);
       setValidationErrors({});
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (!validateCurrentPage()) return;
-
-    // Submit any unanswered questions on the current page
-    const submissionPromises = currentQuestions.map(async (question) => {
-      const questionId = question.id;
-
-      // If question is already answered correctly, skip submission
-      if (questionStatuses[questionId] === 1) {
-        return true;
-      }
-
-      // If question has an answer, submit it
-      const answer = answers[questionId];
-      if (answer && answer.trim() !== "") {
-        return await submitCurrentAnswer(questionId);
-      }
-
-      // If no answer but required, this should have been caught by validation
-      return !question.isRequired;
-    });
-
-    const results = await Promise.all(submissionPromises);
-    const allSuccessful = results.every((result) => result);
-
-    if (allSuccessful) {
-      checkMissionCompletion();
+      setShowResponse(false);
     }
   };
 
   // Allow retrying incorrect questions
-  const handleRetryQuestion = (questionId: number) => {
+  const handleRetryQuestion = () => {
+    if (!currentQuestion) return;
+
+    // Reset current question status to 0 (not attempted/incorrect)
     setQuestionStatuses((prev) => ({
       ...prev,
-      [questionId]: 0,
+      [currentQuestion.id]: 0,
     }));
 
+    // Clear the answer
     setAnswers((prev) => ({
       ...prev,
-      [questionId]: "",
+      [currentQuestion.id]: "",
     }));
 
     setShowResponse(false);
     setResponseMessage("");
     setValidationErrors((prev) => {
       const updated = { ...prev };
-      delete updated[questionId];
+      delete updated[currentQuestion.id];
       return updated;
     });
-  };
-
-  const handleQuestionClick = (questionId: number) => {
-    if (activeQuestionId === questionId) {
-      setActiveQuestionId(null);
-    } else {
-      setActiveQuestionId(questionId);
-
-      setTimeout(() => {
-        const questionElement = document.getElementById(
-          `question-${questionId}`
-        );
-        if (questionElement && questionsContainerRef.current) {
-          const containerRect =
-            questionsContainerRef.current.getBoundingClientRect();
-          const elementRect = questionElement.getBoundingClientRect();
-
-          if (
-            elementRect.bottom > containerRect.bottom ||
-            elementRect.top < containerRect.top
-          ) {
-            questionElement.scrollIntoView({
-              behavior: "smooth",
-              block: "center",
-            });
-          }
-        }
-      }, 150);
-    }
   };
 
   const toggleHint = (questionId: number) => {
@@ -416,170 +349,16 @@ const PdfQuestions = ({
     }
   };
 
-  const handleMultipleChoiceChange = (
-    questionId: number,
-    optionId: string,
-    isChecked: boolean
-  ) => {
-    if (questionStatuses[questionId] === 1) return;
-
-    const currentAnswers = answers[questionId]
-      ? answers[questionId].split(",")
-      : [];
-    let newAnswers;
-
-    if (isChecked) {
-      newAnswers = [...currentAnswers, optionId];
-    } else {
-      newAnswers = currentAnswers.filter((id) => id !== optionId);
-    }
-
-    const newValue = newAnswers.join(",");
-    setAnswers((prev) => ({
-      ...prev,
-      [questionId]: newValue,
-    }));
-  };
-
-  const handleStarRating = (questionId: number, rating: number) => {
-    if (questionStatuses[questionId] === 1) return;
-
-    const ratingValue = rating.toString();
-    setAnswers((prev) => ({
-      ...prev,
-      [questionId]: ratingValue,
-    }));
-  };
-
-  const handleDragStart = (e: React.DragEvent, itemId: string) => {
-    // Only allow drag if question is not already correct
-    if (questionStatuses[activeQuestionId || 0] === 1) return;
-
-    setDraggedItem(itemId);
-    e.dataTransfer.effectAllowed = "move";
-  };
-
-  const handleDropAtPosition = (targetPosition: number, questionId: number) => {
-    console.log(
-      "Drop attempted at position:",
-      targetPosition,
-      "with draggedItem:",
-      draggedItem
-    );
-
-    if (!draggedItem) {
-      console.log("No dragged item found");
-      return;
-    }
-
-    const currentQuestion = questions.find((q) => q.id === questionId);
-    if (!currentQuestion?.matchingtems || !currentQuestion?.options) {
-      console.log("Question or items not found");
-      return;
-    }
-
-    // Get current order from imageOrders state or default
-    let currentOrder;
-    if (imageOrders[questionId]) {
-      currentOrder = imageOrders[questionId].map((item) => item.id);
-    } else {
-      // Initialize from saved answer if available
-      const savedAnswer = answers[questionId];
-      if (savedAnswer && savedAnswer.trim() !== "") {
-        try {
-          const parsedAnswer = JSON.parse(savedAnswer);
-          if (Array.isArray(parsedAnswer)) {
-            currentOrder = parsedAnswer.map((pair) => pair.split("-")[1]);
-          } else {
-            currentOrder = currentQuestion.matchingtems.map((item) => item.id);
-          }
-        } catch (e) {
-          currentOrder = currentQuestion.matchingtems.map((item) => item.id);
-        }
-      } else {
-        currentOrder = currentQuestion.matchingtems.map((item) => item.id);
-      }
-    }
-
-    console.log("Current order before move:", currentOrder);
-
-    // Find current position of dragged item
-    const currentPosition = currentOrder.indexOf(draggedItem);
-    if (currentPosition === -1) {
-      console.log("Dragged item not found in current order");
-      return;
-    }
-
-    console.log(
-      "Moving item from position",
-      currentPosition,
-      "to position",
-      targetPosition
-    );
-
-    // Adjust target position if moving item down (account for removal)
-    let adjustedTargetPosition = targetPosition;
-    if (currentPosition < targetPosition) {
-      adjustedTargetPosition = targetPosition - 1;
-    }
-
-    // Don't do anything if dropping in the same position
-    if (currentPosition === adjustedTargetPosition) {
-      console.log("Same position, no change needed");
-      setDraggedItem(null);
-      return;
-    }
-
-    // Create new order array
-    const newOrder = [...currentOrder];
-
-    // Remove item from current position
-    const [removedItem] = newOrder.splice(currentPosition, 1);
-
-    // Insert at target position
-    newOrder.splice(adjustedTargetPosition, 0, removedItem);
-
-    console.log("New order after move:", newOrder);
-
-    // Update the imageOrders state with the new order
-    const newImageOrder = newOrder
-      .map((id) => currentQuestion.matchingtems?.find((item) => item.id === id))
-      .filter(Boolean);
-
-    setImageOrders((prev) => ({
-      ...prev,
-      [questionId]: newImageOrder,
-    }));
-
-    // Create answer in the expected format ["1-A","2-B","3-C","4-D"]
-    const formattedAnswer = newOrder.map((imageId, index) => {
-      // Find the corresponding step number (1-based index from options)
-      const stepNumber = index + 1;
-      return `${stepNumber}-${imageId}`;
-    });
-
-    console.log("Formatted answer:", formattedAnswer);
-
-    // Update the answer
-    setAnswers((prev) => ({
-      ...prev,
-      [questionId]: JSON.stringify(formattedAnswer),
-    }));
-
-    setDraggedItem(null);
-  };
-
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
 
   // Render content based on mission type
   const renderContent = () => {
-    console.log("Rendering content for mission type:", missionType);
     if (missionType === "PDF_MISSION") {
       return (
         <div className="w-full h-full min-h-[600px]">
-          <PdfViewer url={missionFile} />
+          <PdfViewer url={missionFile || ""} />
         </div>
       );
     } else if (missionType === "VIDEO_MISSION") {
@@ -602,425 +381,21 @@ const PdfQuestions = ({
     }
   };
 
-  const renderQuestionInput = (question: Question) => {
-    const questionId = question.id;
-    const questionStatus = questionStatuses[questionId];
-    const isAnsweredCorrectly = questionStatus === 1;
-
-    switch (question.questionTypeId) {
-      case 1: // Short Answer
-        return (
-          <input
-            type="text"
-            className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              isAnsweredCorrectly ? "bg-green-50 border-green-300" : ""
-            }`}
-            value={answers[questionId] || ""}
-            onChange={(e) => handleAnswerChange(questionId, e.target.value)}
-            placeholder={question.placeholder || "Enter your answer..."}
-            maxLength={question.characterLimit}
-            disabled={isSubmitting || isAnsweredCorrectly}
-          />
-        );
-
-      case 2: // Long Answer
-        return (
-          <div>
-            <textarea
-              className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                isAnsweredCorrectly ? "bg-green-50 border-green-300" : ""
-              }`}
-              rows={4}
-              value={answers[questionId] || ""}
-              onChange={(e) => handleAnswerChange(questionId, e.target.value)}
-              placeholder={
-                question.placeholder || "Enter your detailed answer..."
-              }
-              maxLength={question.characterLimit}
-              disabled={isSubmitting || isAnsweredCorrectly}
-            />
-            {question.characterLimit && (
-              <div className="text-sm text-gray-500 mt-1">
-                {(answers[questionId] || "").length}/{question.characterLimit}{" "}
-                characters
-              </div>
-            )}
-          </div>
-        );
-
-      case 3: // Multiple Choice
-        return (
-          <div className="space-y-2">
-            {question.options?.map((option) => (
-              <label
-                key={option.id}
-                className={`flex items-center space-x-2 cursor-pointer ${
-                  isAnsweredCorrectly ? "opacity-60" : ""
-                }`}
-              >
-                <input
-                  type={question.allowMultipleSelection ? "checkbox" : "radio"}
-                  name={`question-${questionId}`}
-                  value={option.id}
-                  checked={
-                    question.allowMultipleSelection
-                      ? (answers[questionId] || "")
-                          .split(",")
-                          .includes(option.id)
-                      : answers[questionId] === option.id
-                  }
-                  onChange={(e) => {
-                    if (!isSubmitting && !isAnsweredCorrectly) {
-                      if (question.allowMultipleSelection) {
-                        handleMultipleChoiceChange(
-                          questionId,
-                          option.id,
-                          e.target.checked
-                        );
-                      } else {
-                        handleAnswerChange(questionId, option.id);
-                      }
-                    }
-                  }}
-                  className="w-4 h-4"
-                  disabled={isSubmitting || isAnsweredCorrectly}
-                />
-                <span>{option.text}</span>
-              </label>
-            ))}
-          </div>
-        );
-
-      case 4: // Image Choice
-        return (
-          <div className="grid grid-cols-4 gap-4">
-            {question.imageOptions?.map((option) => (
-              <label
-                key={option.id}
-                className={`cursor-pointer ${
-                  isAnsweredCorrectly ? "opacity-60" : ""
-                }`}
-              >
-                <div
-                  className={`border rounded-lg p-2 transition-colors ${
-                    answers[questionId] === option.id
-                      ? "border-blue-500 bg-blue-50"
-                      : ""
-                  }`}
-                >
-                  <img
-                    src={option.imageUrl}
-                    alt={option.altText}
-                    className="w-full h-32 object-cover rounded mb-2"
-                  />
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      name={`question-${questionId}`}
-                      value={option.id}
-                      checked={answers[questionId] === option.id}
-                      onChange={(e) =>
-                        !isSubmitting &&
-                        !isAnsweredCorrectly &&
-                        handleAnswerChange(questionId, option.id)
-                      }
-                      className="w-4 h-4"
-                      disabled={isSubmitting || isAnsweredCorrectly}
-                    />
-                    <span className="text-sm">{option.caption}</span>
-                  </div>
-                </div>
-              </label>
-            ))}
-          </div>
-        );
-
-      case 5: // Matching/Sorting
-        return (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-8">
-              {/* Static Text Options - Left Column */}
-              <div className="space-y-4">
-                <h4 className="font-medium text-gray-700 mb-4">
-                  Steps in Order:
-                </h4>
-                {question.options?.map((option, index) => (
-                  <div
-                    key={option.id}
-                    className="p-4 bg-white border-2 border-gray-200 rounded-lg min-h-[100px] flex items-center"
-                  >
-                    <div className="flex items-center w-full">
-                      <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium mr-4 flex-shrink-0">
-                        {index + 1}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-sm font-semibold text-gray-800">
-                          {option.text}
-                        </h3>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Draggable Images - Right Column (Sortable) */}
-              <div
-                className={`space-y-3 ${
-                  isAnsweredCorrectly || isSubmitting
-                    ? "opacity-60 pointer-events-none"
-                    : ""
-                }`}
-              >
-                <h4 className="font-medium text-gray-700 mb-4">
-                  Drag to sort in correct order:
-                </h4>
-
-                {/* Render the sorted images */}
-                {(() => {
-                  let orderedImages = [];
-
-                  if (!question.matchingtems) return null;
-
-                  if (imageOrders[questionId]) {
-                    orderedImages = imageOrders[questionId];
-                  } else {
-                    const savedAnswer = answers[questionId];
-
-                    if (savedAnswer && savedAnswer.trim() !== "") {
-                      try {
-                        const parsedAnswer = JSON.parse(savedAnswer);
-                        if (Array.isArray(parsedAnswer)) {
-                          const orderedIds = parsedAnswer.map(
-                            (pair) => pair.split("-")[1]
-                          );
-                          orderedImages = orderedIds
-                            .map((id) =>
-                              question.matchingtems?.find(
-                                (item) => item.id === id
-                              )
-                            )
-                            .filter(Boolean);
-
-                          if (
-                            orderedImages.length !==
-                            question.matchingtems.length
-                          ) {
-                            orderedImages = [...question.matchingtems];
-                          }
-                        } else {
-                          orderedImages = [...question.matchingtems];
-                        }
-                      } catch (e) {
-                        orderedImages = [...question.matchingtems];
-                      }
-                    } else {
-                      orderedImages = [...question.matchingtems];
-                    }
-
-                    setImageOrders((prev) => ({
-                      ...prev,
-                      [questionId]: orderedImages,
-                    }));
-                  }
-
-                  return (
-                    <div className="space-y-2">
-                      {orderedImages.map((item, index) => (
-                        <div key={`${item.id}-${index}`}>
-                          {/* Simple drop zone before item */}
-                          {draggedItem && draggedItem !== item.id && (
-                            <div
-                              className="h-8 bg-blue-50 border border-dashed border-blue-300 rounded text-center text-xs text-blue-600 leading-8 mb-1"
-                              onDragOver={(e) => {
-                                e.preventDefault();
-                                e.dataTransfer.dropEffect = "move";
-                              }}
-                              onDrop={(e) => {
-                                e.preventDefault();
-                                handleDropAtPosition(index, questionId);
-                              }}
-                            >
-                              Drop here
-                            </div>
-                          )}
-
-                          {/* Simple draggable item */}
-                          <div
-                            draggable={!isAnsweredCorrectly && !isSubmitting}
-                            onDragStart={(e) => {
-                              if (!isAnsweredCorrectly && !isSubmitting) {
-                                e.dataTransfer.effectAllowed = "move";
-                                setDraggedItem(item.id);
-                              }
-                            }}
-                            onDragEnd={() => setDraggedItem(null)}
-                            className={`bg-white border rounded-lg p-3 flex items-center ${
-                              !isAnsweredCorrectly && !isSubmitting
-                                ? "cursor-move"
-                                : "cursor-default"
-                            } ${
-                              draggedItem === item.id
-                                ? "opacity-50 border-blue-400"
-                                : "border-gray-200 hover:border-gray-300"
-                            }`}
-                          >
-                            <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium mr-3">
-                              {index + 1}
-                            </div>
-
-                            <div className="w-16 h-16 mr-3">
-                              <img
-                                src={item.imageUrl}
-                                alt={item.altText}
-                                className="w-full h-full object-cover rounded"
-                                draggable={false}
-                              />
-                            </div>
-
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-800">
-                                {item.caption}
-                              </p>
-                            </div>
-
-                            {!isAnsweredCorrectly && !isSubmitting && (
-                              <div className="text-gray-400 ml-2">⋮⋮</div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-
-                      {/* Final drop zone */}
-                      {draggedItem && (
-                        <div
-                          className="h-8 bg-blue-50 border border-dashed border-blue-300 rounded text-center text-xs text-blue-600 leading-8 mt-1"
-                          onDragOver={(e) => {
-                            e.preventDefault();
-                            e.dataTransfer.dropEffect = "move";
-                          }}
-                          onDrop={(e) => {
-                            e.preventDefault();
-                            handleDropAtPosition(
-                              orderedImages.length,
-                              questionId
-                            );
-                          }}
-                        >
-                          Drop here
-                        </div>
-                      )}
-                    </div>
-                  );
-                })()}
-              </div>
-            </div>
-          </div>
-        );
-
-      case 6: // Star Rating
-        return (
-          <div
-            className={`flex items-center space-x-1 ${
-              isAnsweredCorrectly ? "opacity-60" : ""
-            }`}
-          >
-            {[...Array(question.maxRating || 5)].map((_, i) => (
-              <button
-                key={i}
-                onClick={() =>
-                  !isAnsweredCorrectly &&
-                  !isSubmitting &&
-                  handleStarRating(questionId, i + 1)
-                }
-                className={`p-1 transition-colors ${
-                  i < parseInt(answers[questionId] || "0")
-                    ? "text-yellow-400"
-                    : "text-gray-300"
-                } ${
-                  isAnsweredCorrectly || isSubmitting
-                    ? "cursor-default"
-                    : "cursor-pointer"
-                }`}
-                disabled={isAnsweredCorrectly || isSubmitting}
-              >
-                <Star className="w-9 h-9 fill-current" />
-              </button>
-            ))}
-          </div>
-        );
-
-      case 8: // Number Rating
-        return (
-          <div className="space-y-4">
-            <div className="flex flex-wrap gap-2">
-              {Array.from(
-                { length: (question.maxRating || 10) - 1 + 1 },
-                (_, index) => {
-                  const ratingValue = 1 + index;
-                  const isSelected =
-                    parseInt(answers[questionId]) === ratingValue;
-
-                  return (
-                    <button
-                      key={ratingValue}
-                      onClick={() =>
-                        !isAnsweredCorrectly &&
-                        !isSubmitting &&
-                        handleAnswerChange(questionId, ratingValue.toString())
-                      }
-                      className={`w-12 h-12 rounded-lg border font-medium text-sm transition-all duration-200 hover:scale-105 ${
-                        isSelected
-                          ? "border-blue-500 bg-blue-500 text-white shadow-lg"
-                          : "border-gray-300 bg-white text-gray-700 hover:border-blue-300 hover:bg-blue-50"
-                      } ${
-                        isAnsweredCorrectly || isSubmitting
-                          ? "opacity-60 cursor-default"
-                          : "cursor-pointer"
-                      }`}
-                      disabled={isAnsweredCorrectly || isSubmitting}
-                    >
-                      {ratingValue}
-                    </button>
-                  );
-                }
-              )}
-            </div>
-          </div>
-        );
-
-      case 7: // User Search
-        return (
-          <div className="space-y-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search for users..."
-                value={searchQuery[questionId] || ""}
-                onChange={(e) =>
-                  !isAnsweredCorrectly &&
-                  !isSubmitting &&
-                  setSearchQuery((prev) => ({
-                    ...prev,
-                    [questionId]: e.target.value,
-                  }))
-                }
-                className={`w-full pl-10 p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  isAnsweredCorrectly ? "bg-green-50 border-green-300" : ""
-                }`}
-                disabled={isAnsweredCorrectly || isSubmitting}
-              />
-            </div>
-            <div className="text-sm text-gray-500">
-              Selected: {answers[questionId] || "None"}
-            </div>
-          </div>
-        );
-
-      default:
-        return <div>Unsupported question type: {question.questionTypeId}</div>;
+  const getButtonText = () => {
+    if (isSubmitting) return "Submitting...";
+    if (isLastQuestion) {
+      return isCurrentQuestionCorrect() ? "Complete Mission" : "Submit Mission";
     }
+    return isCurrentQuestionCorrect() ? "Next Question" : "Submit & Next";
   };
+
+  if (!currentQuestion) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="text-gray-600 text-xl">No questions available</div>
+      </div>
+    );
+  }
 
   // When drawer is open - matches the PDF viewer layout
   if (isDrawerOpen) {
@@ -1096,138 +471,60 @@ const PdfQuestions = ({
               ref={questionsContainerRef}
               className="flex-1 overflow-y-auto flex flex-col justify-center pr-4 space-y-6 pt-6 max-h-[calc(100vh-16rem)]"
             >
-              {currentQuestions.map((question) => {
-                const questionId = question.id;
-                const hasError = validationErrors[questionId];
-                const isAnsweredCorrectly = questionStatuses[questionId] === 1;
-
-                return (
-                  <div
-                    id={`question-${questionId}`}
-                    key={questionId}
-                    className={`w-full bg-white overflow-hidden ${
-                      isAnsweredCorrectly ? "border-l-4 border-green-500" : ""
-                    }`}
-                  >
-                    <div
-                      className={`p-2 cursor-pointer flex justify-between items-center transition-colors ${
-                        activeQuestionId === questionId
-                          ? "bg-blue-50 border-blue-200"
-                          : "hover:bg-gray-50"
-                      }`}
-                      onClick={() => handleQuestionClick(questionId)}
-                    >
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold text-gray-500">
-                            Question {question.sequence} ({question.typeCode})
-                          </span>
-                          {question.isRequired && (
-                            <span className="text-red-500 text-sm">*</span>
-                          )}
-                          {isAnsweredCorrectly && (
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              ✓ Correct
-                            </span>
-                          )}
-                          {questionStatuses[questionId] === 0 &&
-                            answers[questionId] && (
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                ⚠ Not Submitted
-                              </span>
-                            )}
-                        </div>
-                        <h3 className="text-[13px] text-black font-bold">
-                          {question.question}
-                        </h3>
-                        {hasError && (
-                          <p className="text-sm text-red-500 font-medium">
-                            {hasError}
-                          </p>
-                        )}
-                      </div>
-                      <span className="text-gray-500">
-                        {activeQuestionId === questionId ? (
-                          <ChevronUp />
-                        ) : (
-                          <ChevronDown />
-                        )}
+              {/* Current Question */}
+              <div className={`w-full bg-white rounded-lg`}>
+                <div className="p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    {questionStatuses[currentQuestion.id] === 1 && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        ✓ Correct
                       </span>
-                    </div>
-
-                    {activeQuestionId === questionId && (
-                      <div className="pb-6 border-t pt-4">
-                        {/* Show response message for the active question */}
-                        {showResponse &&
-                          responseMessage &&
-                          activeQuestionId === questionId && (
-                            <div
-                              className={`mb-4 p-3 rounded-md flex justify-between items-center ${
-                                responseMessage.includes("correct") ||
-                                responseMessage.includes("Correct")
-                                  ? "bg-green-100 text-green-800 border border-green-300"
-                                  : "bg-red-100 text-red-800 border border-red-300"
-                              }`}
-                            >
-                              <span>{responseMessage}</span>
-                              {/* Add retry button for incorrect answers */}
-                              {!responseMessage.includes("correct") &&
-                                !responseMessage.includes("Correct") && (
-                                  <Button
-                                    onClick={() =>
-                                      handleRetryQuestion(questionId)
-                                    }
-                                    variant="outline"
-                                    size="sm"
-                                    className="ml-2 text-xs"
-                                  >
-                                    Try Again
-                                  </Button>
-                                )}
-                            </div>
-                          )}
-
-                        {question.hint && (
-                          <div className="mb-3">
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                toggleHint(questionId);
-                              }}
-                              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                            >
-                              {showHintId === questionId
-                                ? "Hide Hint"
-                                : "Show Hint"}
-                            </button>
-                            {showHintId === questionId && (
-                              <p className="text-sm text-gray-600 mt-2 pl-4 border-l-2 border-blue-500">
-                                {question.hint}
-                              </p>
-                            )}
-                          </div>
-                        )}
-                        {renderQuestionInput(question)}
-
-                        {/* Submit button for individual question */}
-                        {!isAnsweredCorrectly && answers[questionId] && (
-                          <div className="mt-4">
-                            <Button
-                              onClick={() => submitCurrentAnswer(questionId)}
-                              disabled={isSubmitting}
-                              variant="outline"
-                              size="sm"
-                              className="text-xs"
-                            >
-                              {isSubmitting ? "Submitting..." : "Submit Answer"}
-                            </Button>
-                          </div>
-                        )}
-                      </div>
                     )}
                   </div>
-                );
-              })}
+
+                  <h3 className="text-lg font-bold text-black mb-4">
+                    {currentQuestion.question}
+                  </h3>
+
+                  {validationErrors[currentQuestion.id] && (
+                    <p className="text-sm text-red-500 font-medium mb-4">
+                      {validationErrors[currentQuestion.id]}
+                    </p>
+                  )}
+
+                  {currentQuestion.hint && (
+                    <div className="mb-4">
+                      <button
+                        onClick={() => toggleHint(currentQuestion.id)}
+                        className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        {showHintId === currentQuestion.id
+                          ? "Hide Hint"
+                          : "Show Hint"}
+                      </button>
+                      {showHintId === currentQuestion.id && (
+                        <p className="text-sm text-gray-600 mt-2 pl-4 border-l-2 border-blue-500">
+                          {currentQuestion.hint}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Render Question Input using QuestionRenderer */}
+                  <QuestionRenderer
+                    question={currentQuestion}
+                    value={answers[currentQuestion.id] || ""}
+                    onChange={(value) =>
+                      handleAnswerChange(currentQuestion.id, value)
+                    }
+                    disabled={isSubmitting}
+                    isAnsweredCorrectly={
+                      questionStatuses[currentQuestion.id] === 1
+                    }
+                    isSubmitting={isSubmitting}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1236,9 +533,9 @@ const PdfQuestions = ({
       {/* Navigation buttons */}
       <div className="flex justify-center mt-8 space-x-4">
         {/* Previous button */}
-        {currentPage > 0 && (
+        {currentQuestionIndex > 0 && (
           <Button
-            onClick={handlePreviousPage}
+            onClick={handlePrevious}
             variant="default"
             className="w-[200px] h-[50px] rounded-md flex items-center text-[#6C50E0] font-bold justify-center gap-2 bg-gradient-to-t from-[#EDDDFF] to-[#FCFAFF]"
             disabled={isSubmitting}
@@ -1248,25 +545,14 @@ const PdfQuestions = ({
         )}
 
         {/* Next/Submit button */}
-        {currentPage < totalPages - 1 ? (
-          <Button
-            onClick={handleNextPage}
-            variant="default"
-            className="w-[250px] h-[50px] rounded-md flex items-center text-white font-bold justify-center gap-2 bg-gradient-to-t from-[#B276FF] to-[#7C2BDA]"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Submitting..." : "Next"}
-          </Button>
-        ) : (
-          <Button
-            onClick={handleSubmit}
-            variant="default"
-            className="w-[250px] h-[50px] rounded-md flex items-center text-white font-bold justify-center gap-2 bg-gradient-to-t from-[#B276FF] to-[#7C2BDA]"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Submitting..." : "Complete Mission"} <Mouse />
-          </Button>
-        )}
+        <Button
+          onClick={handleNext}
+          disabled={isSubmitting || !canGoNext}
+          variant="default"
+          className="w-[250px] h-[50px] rounded-md flex items-center text-white font-bold justify-center gap-2 bg-gradient-to-t from-[#B276FF] to-[#7C2BDA] disabled:opacity-50"
+        >
+          {getButtonText()} {isLastQuestion && <Mouse />}
+        </Button>
       </div>
     </section>
   );

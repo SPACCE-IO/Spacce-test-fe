@@ -173,7 +173,6 @@ const PosterMission = ({ mission }: PosterMissionComponentProps) => {
             entry.target.getAttribute("data-section-index")
           );
           setActiveSection(sectionIndex);
-          console.log("Active section:", sectionIndex);
         }
       });
     };
@@ -228,7 +227,6 @@ const PosterMission = ({ mission }: PosterMissionComponentProps) => {
 
   return (
     <div className="h-screen  overflow-hidden">
-      <Navbar />
       <AnimatedMissionBadge
         mission={mission.type}
         missionStatus={isMissionComplete ? "complete" : "incomplete"}

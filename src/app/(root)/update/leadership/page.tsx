@@ -96,7 +96,6 @@ const MissionLeadership = () => {
             entry.target.getAttribute("data-section-index")
           );
           setActiveSection(sectionIndex);
-          console.log("Active section:", sectionIndex);
         }
       });
     };

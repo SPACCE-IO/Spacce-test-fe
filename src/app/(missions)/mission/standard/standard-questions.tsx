@@ -91,7 +91,6 @@ const StandardQuestions = ({
   const [questionStatuses, setQuestionStatuses] = useState<{
     [key: number]: number;
   }>({});
-  console.log("user answers",answers)
   const [showHintId, setShowHintId] = useState<number | null>(null);
   const [validationErrors, setValidationErrors] = useState<{
     [key: number]: string;

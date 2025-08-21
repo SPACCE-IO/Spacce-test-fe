@@ -4,7 +4,6 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Mouse } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
-import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import PdfIntro from "./pdf-intro";
 import PdfQuestions from "./pdf-questions";
 import AnimatedMissionBadge from "@/src/components/AnimatedMissionBadge";
@@ -12,6 +11,8 @@ import Navbar from "@/src/components/navbar";
 import StartSection from "@/src/components/start-section";
 import { useSession } from "next-auth/react";
 import { useLogResponseMutation } from "@/src/services/missionManagement";
+import MissionInstruction from "@/src/components/mission/MissionInstruction";
+import TaskPaginationSection from "@/src/components/mission/TaskPaginationSection";
 // Define interfaces based on your API response
 interface MissionDocument {
   name: string;
@@ -111,34 +112,6 @@ const PdfMission = ({ mission }: StandardMissionComponentProps) => {
   // Check if mission is complete based on status
   const isMissionComplete = mission?.status === 2 || mission?.status === 1;
 
-  const handleMissionSubmit = (answers: { [key: number]: string }) => {
-    console.log("Submitted answers:", answers);
-    router.push("/congratulation");
-  };
-
-  // Handle individual question submission
-  const handleQuestionSubmit = async (questionId: number, answer: string) => {
-    try {
-      await logResponse({
-        authToken: session?.accessToken,
-        body: {
-          questionId: questionId,
-          answer: answer,
-        },
-        id: questionId.toString(),
-      });
-    } catch (error) {
-      console.error("Failed to submit answer:", error);
-    }
-  };
-
-  function getFileByFileName(
-    files: { fileName: string; name: string }[],
-    fileName: string
-  ) {
-    return files?.find((file) => file.fileName === fileName) || null;
-  }
-
   const scrollToSection = (direction: "up" | "down") => {
     if (containerRef.current) {
       const container = containerRef.current;
@@ -174,7 +147,6 @@ const PdfMission = ({ mission }: StandardMissionComponentProps) => {
             entry.target.getAttribute("data-section-index")
           );
           setActiveSection(sectionIndex);
-          console.log("Active section:", sectionIndex);
         }
       });
     };
@@ -229,7 +201,6 @@ const PdfMission = ({ mission }: StandardMissionComponentProps) => {
 
   return (
     <div className="h-screen  overflow-hidden">
-      <Navbar />
       <AnimatedMissionBadge
         mission={mission.type}
         missionStatus={isMissionComplete ? "complete" : "incomplete"}
@@ -321,141 +292,3 @@ const PdfMission = ({ mission }: StandardMissionComponentProps) => {
 };
 
 export default PdfMission;
-
-interface MissionSearchProps {
-  title: string;
-  missionInstruction: string;
-  missionName: string;
-  children?: React.ReactNode;
-  handleButtonScroll?: () => void;
-}
-
-const MissionInstruction = ({
-  title,
-  handleButtonScroll,
-  missionInstruction,
-  missionName,
-  children,
-}: MissionSearchProps) => {
-  return (
-    <section className="relative min-h-screen justify-center -my-6 flex flex-col p-5 mx-auto container ">
-      <div className="w-full p-10">
-        {/* Mission Name */}
-        <p className="text-gray-600 text-sm mb-2">Why I Woke Up</p>
-
-        {/* Title */}
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Mission Task</h1>
-
-        {/* Description */}
-        <p className="text-gray-700 text-base leading-relaxed max-w-xl mb-12">
-          Have a look at the infographic / pdf to get a better idea on how to
-          submit your tested concept. Your task today is to schedule time in
-          your diary over the next 6 months to work on this. Please schedule a
-          minimum of 2 hours a month. This mission is your initiation into our
-          curious club. Get ready to innovate, learn and grow
-        </p>
-
-        <div className="flex absolute bottom-28 w-full mx-auto  justify-center items-center ">
-          <Button
-            variant={"default"}
-            className="w-[250px] h-[50px] rounded-md flex items-center text-white font-bold justify-center gap-2 bg-gradient-to-t from-[#B276FF] to-[#7C2BDA]"
-            onClick={handleButtonScroll}
-          >
-            Start Mission <Mouse />
-          </Button>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-interface TaskPaginationSectionProps {
-  title?: string;
-  totalSteps?: number;
-  currentStep?: number;
-  onScrollUp: () => void;
-  onScrollDown: () => void;
-}
-
-const TaskPaginationSection: React.FC<TaskPaginationSectionProps> = ({
-  title,
-  totalSteps,
-  currentStep,
-  onScrollUp,
-  onScrollDown,
-}) => {
-  console.log(
-    "TaskPaginationSection rendered with title:",
-    title,
-    "totalSteps:",
-    totalSteps,
-    "currentStep:",
-    currentStep
-  );
-  return (
-    <div className="right-0 z-10 fixed h-[90vh] w-[122px] pt-10 pb-[60px] pr-[32px] bg-center bg-no-repeat bg-fixed bg-opacity-50">
-      <p
-        className={`text-[12px] ${
-          title?.toLocaleLowerCase() == "congratulations" && "text-white"
-        } text-colors-primarypurpurple opacity-45 text-end pb-[12px]`}
-      >
-        {title}
-      </p>
-      <div className="flex justify-end items-end gap-2 w-full">
-        <div className="grid grid-flow-row gap-2 w-[37px]">
-          {title !== "" && totalSteps !== undefined && currentStep !== undefined
-            ? Array.from({ length: totalSteps }).map((_, index) =>
-                title?.toLocaleLowerCase() === "congratulations" ? (
-                  <div
-                    key={index}
-                    className={`h-1 w-full rounded-[1px] ${
-                      index === currentStep - 1
-                        ? "bg-white"
-                        : "bg-white opacity-40"
-                    }`}
-                  ></div>
-                ) : (
-                  <div
-                    key={index}
-                    className={`h-1 w-full rounded-[1px] ${
-                      index === currentStep - 1
-                        ? "bg-colors-primarypurpurple opacity-45 "
-                        : "bg-colors-primarypurpurple opacity-10"
-                    }`}
-                  ></div>
-                )
-              )
-            : ""}
-        </div>
-      </div>
-      {currentStep !== undefined && currentStep > 1 && (
-        <div className="absolute z-30 bottom-10 right-10">
-          <div className=" grid-cols-2 relative z-50  grid w-max flex-col justify-end items-end bg-colors-buttonNav bg-opacity-20 rounded-[4px]">
-            <Button
-              onClick={onScrollUp}
-              className=" w-[40px] h-[40px] rounded-l-[4px] rounded-r-none bg-transparent border border-colors-buttonNav border-opacity-30 hover:bg-colors-buttonNav hover:bg-opacity-30"
-            >
-              <FaCaretUp
-                height={24}
-                width={24}
-                color="#5C28DF"
-                className=" w-[40px] h-[40px] rounded-[4px] bg-transparent"
-              />
-            </Button>
-            <Button
-              onClick={onScrollDown}
-              className=" w-[40px] h-[40px] rounded-r-[4px] rounded-l-none bg-transparent border border-colors-buttonNav border-opacity-30 hover:bg-colors-buttonNav hover:bg-opacity-30"
-            >
-              <FaCaretDown
-                height={24}
-                width={24}
-                color="#5C28DF"
-                className=" w-[40px] h-[40px] rounded-[4px] bg-transparent"
-              />
-            </Button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};

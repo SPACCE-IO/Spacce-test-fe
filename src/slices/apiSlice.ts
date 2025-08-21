@@ -3,6 +3,8 @@ import {
   createApi,
   FetchBaseQueryError,
 } from "@reduxjs/toolkit/query/react";
+import { error } from "console";
+import { signOut } from "next-auth/react";
 
 // Define types for API responses
 interface ApiResponse {
@@ -43,6 +45,10 @@ const baseQueryWithStandardizedErrors = async (
 
   // Handle HTTP-level errors (status codes >= 400)
   if (result.error) {
+  
+    if(result.error.status === 401){
+      signOut({ redirect: true, redirectTo: "/login" });
+    }
     return {
       error: {
         status: (result.error.status as number) || 500,
@@ -58,6 +64,7 @@ const baseQueryWithStandardizedErrors = async (
   // or if the status code indicates an error
   const data = result.data as ApiResponse;
   if (data?.error || (data?.statusCode && data?.statusCode >= 400)) {
+     
     return {
       error: {
         status: data?.statusCode || 400,

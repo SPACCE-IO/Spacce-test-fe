@@ -261,8 +261,6 @@ const {data:session} = useSession()
         }
       }
 
-      console.log("userProfileDetails:", userProfileDetails);
-
       await updateProfile({
         body: formDataPayload,
         authToken: session?.accessToken,

@@ -1,15 +1,11 @@
 "use client";
 import { Button } from "@/src/components/ui/button";
-import {
-  Mouse,
-  Star,
-  Search,
-} from "lucide-react";
+import { Mouse } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { QuestionRenderer } from "@/src/components/questions/QuestionRenderer";
 import { useSession } from "next-auth/react";
 import { useLogResponseMutation } from "@/src/services/missionManagement";
-import { useLazyGetUsersQuery } from "@/src/services/employeeManagement";
 
 interface Option {
   id: string;
@@ -96,8 +92,6 @@ const AppreciationQuestions = ({
     [key: number]: number;
   }>({});
   const [showHintId, setShowHintId] = useState<number | null>(null);
-  const [draggedItem, setDraggedItem] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState<{ [key: number]: string }>({});
   const [validationErrors, setValidationErrors] = useState<{
     [key: number]: string;
   }>({});
@@ -105,17 +99,10 @@ const AppreciationQuestions = ({
   const [responseMessage, setResponseMessage] = useState<string>("");
   const [showResponse, setShowResponse] = useState(false);
   const [missionStatus, setMissionStatus] = useState(1); // Track overall mission status
-  const [imageOrders, setImageOrders] = useState<{ [key: number]: any[] }>({});
 
   const questionsContainerRef = useRef<HTMLDivElement>(null);
   const { data: session } = useSession();
   const [logResponse] = useLogResponseMutation();
-  const [getUsers, { data: users, isLoading, isSuccess, isError }] =
-    useLazyGetUsersQuery();
-
-  useEffect(() => {
-    getUsers(session?.accessToken);
-  }, []);
 
   // Initialize question statuses and answers from props
   useEffect(() => {
@@ -200,8 +187,6 @@ const AppreciationQuestions = ({
         answer: answer ? answer.trim() : "",
       };
 
-      console.log("Submitting answer:", payload);
-
       const response = await logResponse({
         authToken: session?.accessToken,
         body: payload,
@@ -277,111 +262,6 @@ const AppreciationQuestions = ({
     }
   };
 
-  // Add this function after your existing handleDrop function
-
-  const handleDropAtPosition = (targetPosition: number, questionId: number) => {
-    if (!draggedItem) {
-      console.log("No dragged item found");
-      return;
-    }
-
-    const currentQuestion = questions.find((q) => q.id === questionId);
-    if (!currentQuestion?.matchingtems || !currentQuestion?.options) {
-      console.log("Question or items not found");
-      return;
-    }
-
-    // Get current order from imageOrders state or default
-    let currentOrder;
-    if (imageOrders[questionId]) {
-      currentOrder = imageOrders[questionId].map((item) => item.id);
-    } else {
-      // Initialize from saved answer if available
-      const savedAnswer = answers[questionId];
-      if (savedAnswer && savedAnswer.trim() !== "") {
-        try {
-          const parsedAnswer = JSON.parse(savedAnswer);
-          if (Array.isArray(parsedAnswer)) {
-            currentOrder = parsedAnswer.map((pair) => pair.split("-")[1]);
-          } else {
-            currentOrder = currentQuestion.matchingtems.map((item) => item.id);
-          }
-        } catch (e) {
-          currentOrder = currentQuestion.matchingtems.map((item) => item.id);
-        }
-      } else {
-        currentOrder = currentQuestion.matchingtems.map((item) => item.id);
-      }
-    }
-
-    console.log("Current order before move:", currentOrder);
-
-    // Find current position of dragged item
-    const currentPosition = currentOrder.indexOf(draggedItem);
-    if (currentPosition === -1) {
-      console.log("Dragged item not found in current order");
-      return;
-    }
-
-    console.log(
-      "Moving item from position",
-      currentPosition,
-      "to position",
-      targetPosition
-    );
-
-    // Adjust target position if moving item down (account for removal)
-    let adjustedTargetPosition = targetPosition;
-    if (currentPosition < targetPosition) {
-      adjustedTargetPosition = targetPosition - 1;
-    }
-
-    // Don't do anything if dropping in the same position
-    if (currentPosition === adjustedTargetPosition) {
-      console.log("Same position, no change needed");
-      setDraggedItem(null);
-      return;
-    }
-
-    // Create new order array
-    const newOrder = [...currentOrder];
-
-    // Remove item from current position
-    const [removedItem] = newOrder.splice(currentPosition, 1);
-
-    // Insert at target position
-    newOrder.splice(adjustedTargetPosition, 0, removedItem);
-
-    console.log("New order after move:", newOrder);
-
-    // Update the imageOrders state with the new order
-    const newImageOrder = newOrder
-      .map((id) => currentQuestion.matchingtems?.find((item) => item.id === id))
-      .filter(Boolean);
-
-    setImageOrders((prev) => ({
-      ...prev,
-      [questionId]: newImageOrder,
-    }));
-
-    // Create answer in the expected format ["1-A","2-B","3-C","4-D"]
-    const formattedAnswer = newOrder.map((imageId, index) => {
-      // Find the corresponding step number (1-based index from options)
-      const stepNumber = index + 1;
-      return `${stepNumber}-${imageId}`;
-    });
-
-    console.log("Formatted answer:", formattedAnswer);
-
-    // Update the answer
-    setAnswers((prev) => ({
-      ...prev,
-      [questionId]: JSON.stringify(formattedAnswer),
-    }));
-
-    setDraggedItem(null);
-  };
-
   // Check mission completion and redirect accordingly
   const checkMissionCompletion = () => {
     const allQuestionsCorrect = questions.every((question) => {
@@ -391,15 +271,11 @@ const AppreciationQuestions = ({
     if (allQuestionsCorrect) {
       // All questions correct - mission successful
       setMissionStatus(2);
-      setTimeout(() => {
-        router.push("/congratulation");
-      }, 2000);
+      router.push("/congratulation");
     } else {
       // Some questions incorrect - mission failed
       setMissionStatus(1);
-      setTimeout(() => {
-        router.push("/mission-fail");
-      }, 2000);
+      router.push("/mission-fail");
     }
   };
 
@@ -460,541 +336,6 @@ const AppreciationQuestions = ({
     }
   };
 
-  const handleMultipleChoiceChange = (
-    questionId: number,
-    optionId: string,
-    isChecked: boolean
-  ) => {
-    // Only allow changes if question is not already correct
-    if (questionStatuses[questionId] === 1) return;
-
-    const currentAnswers = answers[questionId]
-      ? answers[questionId].split(",")
-      : [];
-    let newAnswers;
-
-    if (isChecked) {
-      newAnswers = [...currentAnswers, optionId];
-    } else {
-      newAnswers = currentAnswers.filter((id) => id !== optionId);
-    }
-
-    const newValue = newAnswers.join(",");
-    setAnswers((prev) => ({
-      ...prev,
-      [questionId]: newValue,
-    }));
-  };
-
-  const handleStarRating = (questionId: number, rating: number) => {
-    // Only allow changes if question is not already correct
-    if (questionStatuses[questionId] === 1) return;
-
-    const ratingValue = rating.toString();
-    setAnswers((prev) => ({
-      ...prev,
-      [questionId]: ratingValue,
-    }));
-  };
-
-  const handleDragStart = (e: React.DragEvent, itemId: string) => {
-    // Only allow drag if question is not already correct
-    if (questionStatuses[currentQuestion?.id] === 1) return;
-
-    setDraggedItem(itemId);
-    e.dataTransfer.effectAllowed = "move";
-  };
-
-  // Add this function after your existing handleDrop function
-
-  const handleDrop = (
-    e: React.DragEvent,
-    targetPosition: number,
-    questionId: number
-  ) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // Only allow drop if question is not already correct
-    if (questionStatuses[questionId] === 1) return;
-
-    if (!draggedItem) return;
-
-    const currentQuestion = questions.find((q) => q.id === questionId);
-
-    if (currentQuestion?.questionTypeId === 5 && currentQuestion.matchingtems) {
-      let currentOrder;
-      const savedOrder = answers[questionId];
-
-      if (savedOrder && savedOrder.trim() !== "") {
-        currentOrder = savedOrder.split(",").filter((id) => id.trim() !== "");
-      } else {
-        currentOrder = currentQuestion.matchingtems.map((item) => item.id);
-      }
-
-      const currentPosition = currentOrder.indexOf(draggedItem);
-      if (currentPosition === -1 || currentPosition === targetPosition) {
-        setDraggedItem(null);
-        return;
-      }
-
-      const newOrder = [...currentOrder];
-      newOrder.splice(currentPosition, 1);
-      newOrder.splice(targetPosition, 0, draggedItem);
-
-      setAnswers((prev) => ({
-        ...prev,
-        [questionId]: newOrder.join(","),
-      }));
-    }
-
-    setDraggedItem(null);
-  };
-
-  const getOrderedImages = (question: Question, questionId: number) => {
-    if (!question.matchingtems) return [];
-
-    const savedOrder = answers[questionId];
-    if (savedOrder && savedOrder.trim() !== "") {
-      try {
-        const orderIds = savedOrder.split(",").filter((id) => id.trim() !== "");
-        const orderedItems = orderIds
-          .map((id) => question.matchingtems?.find((item) => item.id === id))
-          .filter(Boolean) as MatchingItem[];
-
-        if (orderedItems.length === question.matchingtems.length) {
-          return orderedItems;
-        }
-      } catch (e) {
-        console.error("Error parsing saved order:", e);
-      }
-    }
-
-    return [...question.matchingtems];
-  };
-
-  const renderQuestionInput = (question: Question) => {
-    const questionId = question.id;
-    const questionStatus = questionStatuses[questionId];
-    const isAnsweredCorrectly = questionStatus === 1;
-
-    switch (question.questionTypeId) {
-      case 1: // Short Answer
-        return (
-          <input
-            type="text"
-            className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              isAnsweredCorrectly ? "bg-green-50 border-green-300" : ""
-            }`}
-            value={answers[questionId] || ""}
-            onChange={(e) => handleAnswerChange(questionId, e.target.value)}
-            placeholder={question.placeholder || "Enter your answer..."}
-            maxLength={question.characterLimit}
-            disabled={isSubmitting || isAnsweredCorrectly}
-          />
-        );
-
-      case 2: // Long Answer
-        return (
-          <div>
-            <textarea
-              className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                isAnsweredCorrectly ? "bg-green-50 border-green-300" : ""
-              }`}
-              rows={4}
-              value={answers[questionId] || ""}
-              onChange={(e) => handleAnswerChange(questionId, e.target.value)}
-              placeholder={
-                question.placeholder || "Enter your detailed answer..."
-              }
-              maxLength={question.characterLimit}
-              disabled={isSubmitting || isAnsweredCorrectly}
-            />
-            {question.characterLimit && (
-              <div className="text-sm text-gray-500 mt-1">
-                {(answers[questionId] || "").length}/{question.characterLimit}{" "}
-                characters
-              </div>
-            )}
-          </div>
-        );
-
-      case 3: // Multiple Choice
-        return (
-          <div className="space-y-2">
-            {question.options?.map((option) => (
-              <label
-                key={option.id}
-                className={`flex items-center space-x-2 cursor-pointer ${
-                  isAnsweredCorrectly ? "opacity-60" : ""
-                }`}
-              >
-                <input
-                  type={question.allowMultipleSelection ? "checkbox" : "radio"}
-                  name={`question-${questionId}`}
-                  value={option.id}
-                  checked={
-                    question.allowMultipleSelection
-                      ? (answers[questionId] || "")
-                          .split(",")
-                          .includes(option.id)
-                      : answers[questionId] === option.id
-                  }
-                  onChange={(e) => {
-                    if (!isSubmitting && !isAnsweredCorrectly) {
-                      if (question.allowMultipleSelection) {
-                        handleMultipleChoiceChange(
-                          questionId,
-                          option.id,
-                          e.target.checked
-                        );
-                      } else {
-                        handleAnswerChange(questionId, option.id);
-                      }
-                    }
-                  }}
-                  className="w-4 h-4"
-                  disabled={isSubmitting || isAnsweredCorrectly}
-                />
-                <span>{option.text}</span>
-              </label>
-            ))}
-          </div>
-        );
-
-      case 4: // Image Choice
-        return (
-          <div className="grid grid-cols-4 gap-4">
-            {question.imageOptions?.map((option) => (
-              <label
-                key={option.id}
-                className={`cursor-pointer ${
-                  isAnsweredCorrectly ? "opacity-60" : ""
-                }`}
-              >
-                <div
-                  className={`border rounded-lg p-2 transition-colors ${
-                    answers[questionId] === option.id
-                      ? "border-blue-500 bg-blue-50"
-                      : ""
-                  }`}
-                >
-                  <img
-                    src={option.imageUrl}
-                    alt={option.altText}
-                    className="w-full h-32 object-cover rounded mb-2"
-                  />
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      name={`question-${questionId}`}
-                      value={option.id}
-                      checked={answers[questionId] === option.id}
-                      onChange={(e) =>
-                        !isSubmitting &&
-                        !isAnsweredCorrectly &&
-                        handleAnswerChange(questionId, option.id)
-                      }
-                      className="w-4 h-4"
-                      disabled={isSubmitting || isAnsweredCorrectly}
-                    />
-                    <span className="text-sm">{option.caption}</span>
-                  </div>
-                </div>
-              </label>
-            ))}
-          </div>
-        );
-
-      // Replace your case 5 in the renderQuestionInput function with this:
-
-      case 5: // Matching/Sorting
-        return (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-8">
-              {/* Static Text Options - Left Column */}
-              <div className="space-y-4">
-                <h4 className="font-medium text-gray-700 mb-4">
-                  Steps in Order:
-                </h4>
-                {question.options?.map((option, index) => (
-                  <div
-                    key={option.id}
-                    className="p-4 bg-white border-2 border-gray-200 rounded-lg min-h-[100px] flex items-center"
-                  >
-                    <div className="flex items-center w-full">
-                      <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium mr-4 flex-shrink-0">
-                        {index + 1}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-sm font-semibold text-gray-800">
-                          {option.text}
-                        </h3>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Draggable Images - Right Column (Sortable) */}
-              <div
-                className={`space-y-3 ${
-                  isAnsweredCorrectly || isSubmitting
-                    ? "opacity-60 pointer-events-none"
-                    : ""
-                }`}
-              >
-                <h4 className="font-medium text-gray-700 mb-4">
-                  Drag to sort in correct order:
-                </h4>
-
-                {/* Render the sorted images */}
-                {(() => {
-                  // Use imageOrders state if available, otherwise compute from answers
-                  let orderedImages = [];
-
-                  if (!question.matchingtems) return null;
-
-                  if (imageOrders[questionId]) {
-                    orderedImages = imageOrders[questionId];
-                  } else {
-                    const savedAnswer = answers[questionId];
-
-                    if (savedAnswer && savedAnswer.trim() !== "") {
-                      try {
-                        const parsedAnswer = JSON.parse(savedAnswer);
-                        if (Array.isArray(parsedAnswer)) {
-                          const orderedIds = parsedAnswer.map(
-                            (pair) => pair.split("-")[1]
-                          );
-                          orderedImages = orderedIds
-                            .map((id) =>
-                              question.matchingtems?.find(
-                                (item) => item.id === id
-                              )
-                            )
-                            .filter(Boolean);
-
-                          if (
-                            orderedImages.length !==
-                            question.matchingtems.length
-                          ) {
-                            orderedImages = [...question.matchingtems];
-                          }
-                        } else {
-                          orderedImages = [...question.matchingtems];
-                        }
-                      } catch (e) {
-                        orderedImages = [...question.matchingtems];
-                      }
-                    } else {
-                      orderedImages = [...question.matchingtems];
-                    }
-
-                    setImageOrders((prev) => ({
-                      ...prev,
-                      [questionId]: orderedImages,
-                    }));
-                  }
-
-                  return (
-                    <div className="space-y-2">
-                      {orderedImages.map((item, index) => (
-                        <div key={`${item.id}-${index}`}>
-                          {/* Simple drop zone before item */}
-                          {draggedItem && draggedItem !== item.id && (
-                            <div
-                              className="h-8 bg-blue-50 border border-dashed border-blue-300 rounded text-center text-xs text-blue-600 leading-8 mb-1"
-                              onDragOver={(e) => {
-                                e.preventDefault();
-                                e.dataTransfer.dropEffect = "move";
-                              }}
-                              onDrop={(e) => {
-                                e.preventDefault();
-                                handleDropAtPosition(index, questionId);
-                              }}
-                            >
-                              Drop here
-                            </div>
-                          )}
-
-                          {/* Simple draggable item */}
-                          <div
-                            draggable={!isAnsweredCorrectly && !isSubmitting}
-                            onDragStart={(e) => {
-                              if (!isAnsweredCorrectly && !isSubmitting) {
-                                e.dataTransfer.effectAllowed = "move";
-                                setDraggedItem(item.id);
-                              }
-                            }}
-                            onDragEnd={() => setDraggedItem(null)}
-                            className={`bg-white border rounded-lg p-3 flex items-center ${
-                              !isAnsweredCorrectly && !isSubmitting
-                                ? "cursor-move"
-                                : "cursor-default"
-                            } ${
-                              draggedItem === item.id
-                                ? "opacity-50 border-blue-400"
-                                : "border-gray-200 hover:border-gray-300"
-                            }`}
-                          >
-                            <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium mr-3">
-                              {index + 1}
-                            </div>
-
-                            <div className="w-16 h-16 mr-3">
-                              <img
-                                src={item.imageUrl}
-                                alt={item.altText}
-                                className="w-full h-full object-cover rounded"
-                                draggable={false}
-                              />
-                            </div>
-
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-800">
-                                {item.caption}
-                              </p>
-                            </div>
-
-                            {!isAnsweredCorrectly && !isSubmitting && (
-                              <div className="text-gray-400 ml-2">⋮⋮</div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-
-                      {/* Final drop zone */}
-                      {draggedItem && (
-                        <div
-                          className="h-8 bg-blue-50 border border-dashed border-blue-300 rounded text-center text-xs text-blue-600 leading-8 mt-1"
-                          onDragOver={(e) => {
-                            e.preventDefault();
-                            e.dataTransfer.dropEffect = "move";
-                          }}
-                          onDrop={(e) => {
-                            e.preventDefault();
-                            handleDropAtPosition(
-                              orderedImages.length,
-                              questionId
-                            );
-                          }}
-                        >
-                          Drop here
-                        </div>
-                      )}
-                    </div>
-                  );
-                })()}
-              </div>
-            </div>
-          </div>
-        );
-      case 6: // Star Rating
-        return (
-          <div
-            className={`flex items-center space-x-1 ${
-              isAnsweredCorrectly ? "opacity-60" : ""
-            }`}
-          >
-            {[...Array(question.maxRating || 5)].map((_, i) => (
-              <button
-                key={i}
-                onClick={() =>
-                  !isAnsweredCorrectly &&
-                  !isSubmitting &&
-                  handleStarRating(questionId, i + 1)
-                }
-                className={`p-1 transition-colors ${
-                  i < parseInt(answers[questionId] || "0")
-                    ? "text-yellow-400"
-                    : "text-gray-300"
-                } ${
-                  isAnsweredCorrectly || isSubmitting
-                    ? "cursor-default"
-                    : "cursor-pointer"
-                }`}
-                disabled={isAnsweredCorrectly || isSubmitting}
-              >
-                <Star className="w-9 h-9 fill-current" />
-              </button>
-            ))}
-          </div>
-        );
-
-      case 8: // Number Rating
-        return (
-          <div className="space-y-4">
-            <div className="flex flex-wrap gap-2">
-              {Array.from(
-                { length: (question.maxRating || 10) - 1 + 1 },
-                (_, index) => {
-                  const ratingValue = 1 + index;
-                  const isSelected =
-                    parseInt(answers[questionId]) === ratingValue;
-
-                  return (
-                    <button
-                      key={ratingValue}
-                      onClick={() =>
-                        !isAnsweredCorrectly &&
-                        !isSubmitting &&
-                        handleAnswerChange(questionId, ratingValue.toString())
-                      }
-                      className={`w-12 h-12 rounded-lg border font-medium text-sm transition-all duration-200 hover:scale-105 ${
-                        isSelected
-                          ? "border-blue-500 bg-blue-500 text-white shadow-lg"
-                          : "border-gray-300 bg-white text-gray-700 hover:border-blue-300 hover:bg-blue-50"
-                      } ${
-                        isAnsweredCorrectly || isSubmitting
-                          ? "opacity-60 cursor-default"
-                          : "cursor-pointer"
-                      }`}
-                      disabled={isAnsweredCorrectly || isSubmitting}
-                    >
-                      {ratingValue}
-                    </button>
-                  );
-                }
-              )}
-            </div>
-          </div>
-        );
-
-      case 7: // User Search
-        return (
-          <div className="space-y-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search for users..."
-                value={searchQuery[questionId] || ""}
-                onChange={(e) =>
-                  !isAnsweredCorrectly &&
-                  !isSubmitting &&
-                  setSearchQuery((prev) => ({
-                    ...prev,
-                    [questionId]: e.target.value,
-                  }))
-                }
-                className={`w-full pl-10 p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  isAnsweredCorrectly ? "bg-green-50 border-green-300" : ""
-                }`}
-                disabled={isAnsweredCorrectly || isSubmitting}
-              />
-            </div>
-            <div className="text-sm text-gray-500">
-              Selected: {answers[questionId] || "None"}
-            </div>
-          </div>
-        );
-
-      default:
-        return <div>Unsupported question type: {question.questionTypeId}</div>;
-    }
-  };
-
   if (!currentQuestion) {
     return (
       <div className="h-screen flex items-center justify-center">
@@ -1024,13 +365,7 @@ const AppreciationQuestions = ({
             className="flex-1 overflow-y-auto flex flex-col justify-center pr-4 space-y-6 pt-6 "
           >
             {/* Current Question */}
-            <div
-              className={`w-full bg-white rounded-lg ${
-                questionStatuses[currentQuestion.id] === 1
-                  ? "border-l-4 border-green-500"
-                  : ""
-              }`}
-            >
+            <div className={`w-full bg-white rounded-lg`}>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-4">
                   {questionStatuses[currentQuestion.id] === 1 && (
@@ -1038,12 +373,6 @@ const AppreciationQuestions = ({
                       ✓ Correct
                     </span>
                   )}
-                  {questionStatuses[currentQuestion.id] === 0 &&
-                    answers[currentQuestion.id] && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                        ⚠ Not Submitted
-                      </span>
-                    )}
                 </div>
 
                 <h3 className="text-lg font-bold text-black mb-4">
@@ -1100,7 +429,19 @@ const AppreciationQuestions = ({
                   </div>
                 )}
 
-                {renderQuestionInput(currentQuestion)}
+                {/* Render Question Input using the new QuestionRenderer component */}
+                <QuestionRenderer
+                  question={currentQuestion}
+                  value={answers[currentQuestion.id] || ""}
+                  onChange={(value) =>
+                    handleAnswerChange(currentQuestion.id, value)
+                  }
+                  disabled={isSubmitting}
+                  isAnsweredCorrectly={
+                    questionStatuses[currentQuestion.id] === 1
+                  }
+                  isSubmitting={isSubmitting}
+                />
               </div>
             </div>
           </div>

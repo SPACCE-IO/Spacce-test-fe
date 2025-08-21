@@ -173,7 +173,6 @@ const TutorialMission = ({ mission }: TutorialMissionComponentProps) => {
             entry.target.getAttribute("data-section-index")
           );
           setActiveSection(sectionIndex);
-          console.log("Active section:", sectionIndex);
         }
       });
     };
@@ -228,7 +227,6 @@ const TutorialMission = ({ mission }: TutorialMissionComponentProps) => {
 
   return (
     <div className="h-screen  overflow-hidden">
-      <Navbar />
       <AnimatedMissionBadge
         mission={mission.type}
         missionStatus={isMissionComplete ? "complete" : "incomplete"}

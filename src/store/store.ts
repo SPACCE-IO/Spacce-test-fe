@@ -4,9 +4,11 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // Defaults to localStorage for web
 import { apiSlice } from "../slices/apiSlice";
+import missionReducer from "../slices/missionSlice";
 
 // Combine all reducers into a root reducer
 const rootReducer = combineReducers({
+  mission: missionReducer,
   [apiSlice.reducerPath]: apiSlice.reducer,
 });
 
@@ -14,7 +16,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: "root", // Key to store in localStorage
   storage, // Use localStorage as storage
-  whitelist: ["auth", "token", "workspace", "profile", "company"], // Specify which reducers to persist
+  whitelist: ["mission"], // Specify which reducers to persist
 };
 
 // Create a persisted reducer

@@ -1,17 +1,14 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
 import { Mouse } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
-import { getAuthToken } from "@/src/utils/auth";
-import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import AnonymousIntro from "./anonymous-intro";
 import AnonymousQuestions from "./anonymous-questions";
-import Navbar from "@/src/components/navbar";
 import AnimatedMissionBadge from "@/src/components/AnimatedMissionBadge";
 import StartSection from "@/src/components/start-section";
-import { useLogResponseMutation } from "@/src/services/missionManagement";
+import MissionInstruction from "@/src/components/mission/MissionInstruction";
+import TaskPaginationSection from "@/src/components/mission/TaskPaginationSection";
 // Define interfaces based on your API response
 interface MissionDocument {
   name: string;
@@ -94,141 +91,106 @@ interface AnonymousMissionComponentProps {
 }
 
 const AnonymousMission = ({ mission }: AnonymousMissionComponentProps) => {
-  const [activeSection, setActiveSection] = useState<number>(0);
-  const totalSteps = 4;
-  const containerRef = useRef<HTMLDivElement>(null!);
-  const startSectionRef = useRef<HTMLDivElement>(null!);
-  const section2Ref = useRef<HTMLDivElement>(null!);
-  const section3Ref = useRef<HTMLDivElement>(null!);
-  const section4Ref = useRef<HTMLDivElement>(null!);
-  const section5Ref = useRef<HTMLDivElement>(null!);
-  const router = useRouter();
-  const token = getAuthToken();
+ const [activeSection, setActiveSection] = useState<number>(0);
+ const totalSteps = 4;
+ const containerRef = useRef<HTMLDivElement>(null!);
+ const startSectionRef = useRef<HTMLDivElement>(null!);
+ const section2Ref = useRef<HTMLDivElement>(null!);
+ const section3Ref = useRef<HTMLDivElement>(null!);
+ const section4Ref = useRef<HTMLDivElement>(null!);
+ const section5Ref = useRef<HTMLDivElement>(null!);
 
-  const [logResponse, logResponseProps] = useLogResponseMutation();
+ // Check if mission is complete based on status
+ const isMissionComplete = mission?.status === 2 || mission?.status === 1;
 
-  // Check if mission is complete based on status
-  const isMissionComplete = mission?.status === 2 || mission?.status === 1;
+ const scrollToSection = (direction: "up" | "down") => {
+   if (containerRef.current) {
+     const container = containerRef.current;
+     const currentScroll = container.scrollTop;
+     const viewportHeight = container.clientHeight;
 
-  const handleMissionSubmit = (answers: { [key: number]: string }) => {
-    console.log("Submitted answers:", answers);
-    router.push("/congratulation");
-  };
+     container.scrollTo({
+       top:
+         currentScroll +
+         (direction === "down" ? viewportHeight : -viewportHeight),
+       behavior: "smooth",
+     });
+   }
+ };
 
-  // Handle individual question submission
-  const handleQuestionSubmit = async (questionId: number, answer: string) => {
-    try {
-      await logResponse({
-        authToken: token,
-        body: {
-          questionId: questionId,
-          answer: answer,
-        },
-        id: questionId.toString(),
-      });
-    } catch (error) {
-      console.error("Failed to submit answer:", error);
-    }
-  };
+ const handleButtonScroll = (sectionRef: React.RefObject<HTMLDivElement>) => {
+   if (sectionRef.current) {
+     sectionRef.current.scrollIntoView({ behavior: "smooth" });
+   }
+ };
 
-  function getFileByFileName(
-    files: { fileName: string; name: string }[],
-    fileName: string
-  ) {
-    return files?.find((file) => file.fileName === fileName) || null;
-  }
+ useEffect(() => {
+   const options = {
+     root: containerRef.current,
+     rootMargin: "0px",
+     threshold: 0.5,
+   };
 
-  const scrollToSection = (direction: "up" | "down") => {
-    if (containerRef.current) {
-      const container = containerRef.current;
-      const currentScroll = container.scrollTop;
-      const viewportHeight = container.clientHeight;
+   const observerCallback = (entries: IntersectionObserverEntry[]) => {
+     entries.forEach((entry) => {
+       if (entry.isIntersecting) {
+         const sectionIndex = Number(
+           entry.target.getAttribute("data-section-index")
+         );
+         setActiveSection(sectionIndex);
+       }
+     });
+   };
 
-      container.scrollTo({
-        top:
-          currentScroll +
-          (direction === "down" ? viewportHeight : -viewportHeight),
-        behavior: "smooth",
-      });
-    }
-  };
+   const observer = new IntersectionObserver(observerCallback, options);
 
-  const handleButtonScroll = (sectionRef: React.RefObject<HTMLDivElement>) => {
-    if (sectionRef.current) {
-      sectionRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  };
+   const sections = [
+     startSectionRef.current,
+     section2Ref.current,
+     section3Ref.current,
+     section4Ref.current,
+     section5Ref.current,
+   ];
 
-  useEffect(() => {
-    const options = {
-      root: containerRef.current,
-      rootMargin: "0px",
-      threshold: 0.5,
-    };
+   sections.forEach((section, index) => {
+     if (section) {
+       section.setAttribute("data-section-index", index.toString());
+       observer.observe(section);
+     }
+   });
 
-    const observerCallback = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const sectionIndex = Number(
-            entry.target.getAttribute("data-section-index")
-          );
-          setActiveSection(sectionIndex);
-          console.log("Active section:", sectionIndex);
-        }
-      });
-    };
+   return () => {
+     sections.forEach((section) => {
+       if (section) observer.unobserve(section);
+     });
+   };
+ }, []);
 
-    const observer = new IntersectionObserver(observerCallback, options);
+ const getTaskTitle = (sectionIndex: number): string => {
+   switch (sectionIndex) {
+     case 1:
+       return "Introduction";
+     case 2:
+       return "Task 01";
+     case 3:
+       return "Task 02";
+     case 4:
+       return "Congratulations";
+     default:
+       return "";
+   }
+ };
 
-    const sections = [
-      startSectionRef.current,
-      section2Ref.current,
-      section3Ref.current,
-      section4Ref.current,
-      section5Ref.current,
-    ];
-
-    sections.forEach((section, index) => {
-      if (section) {
-        section.setAttribute("data-section-index", index.toString());
-        observer.observe(section);
-      }
-    });
-
-    return () => {
-      sections.forEach((section) => {
-        if (section) observer.unobserve(section);
-      });
-    };
-  }, []);
-
-  const getTaskTitle = (sectionIndex: number): string => {
-    switch (sectionIndex) {
-      case 1:
-        return "Introduction";
-      case 2:
-        return "Task 01";
-      case 3:
-        return "Task 02";
-      case 4:
-        return "Congratulations";
-      default:
-        return "";
-    }
-  };
-
-  // Show loading if mission data is not available
-  if (!mission) {
-    return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="text-white text-xl">Loading mission...</div>
-      </div>
-    );
-  }
-
+ // Show loading if mission data is not available
+ if (!mission) {
+   return (
+     <div className="h-screen flex items-center justify-center">
+       <div className="text-white text-xl">Loading mission...</div>
+     </div>
+   );
+ }
   return (
     <div className="h-screen  overflow-hidden">
-      <Navbar />
       <AnimatedMissionBadge
         mission={mission.type}
         missionStatus={isMissionComplete ? "complete" : "incomplete"}
@@ -319,133 +281,3 @@ const AnonymousMission = ({ mission }: AnonymousMissionComponentProps) => {
 };
 
 export default AnonymousMission;
-
-interface MissionSearchProps {
-  title: string;
-  missionInstruction: string;
-  missionName: string;
-  children?: React.ReactNode;
-  handleButtonScroll?: () => void;
-}
-
-const MissionInstruction = ({
-  title,
-  handleButtonScroll,
-  missionInstruction,
-  missionName,
-  children,
-}: MissionSearchProps) => {
-  return (
-    <section className="relative min-h-screen justify-center -my-6 flex flex-col p-5 mx-auto container ">
-      <div className="w-full p-10">
-        {/* Mission Name */}
-        <p className="text-gray-600 text-sm mb-2">Why I Woke Up</p>
-
-        {/* Title */}
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Mission Task</h1>
-
-        {/* Description */}
-        <p className="text-gray-700 text-base leading-relaxed max-w-xl mb-12">
-          Have a look at the infographic / pdf to get a better idea on how to
-          submit your tested concept. Your task today is to schedule time in
-          your diary over the next 6 months to work on this. Please schedule a
-          minimum of 2 hours a month. This mission is your initiation into our
-          curious club. Get ready to innovate, learn and grow
-        </p>
-
-        <div className="flex absolute bottom-28 w-full mx-auto  justify-center items-center ">
-          <Button
-            variant={"default"}
-            className="w-[250px] h-[50px] rounded-md flex items-center text-white font-bold justify-center gap-2 bg-gradient-to-t from-[#B276FF] to-[#7C2BDA]"
-            onClick={handleButtonScroll}
-          >
-            Start Mission <Mouse />
-          </Button>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-interface TaskPaginationSectionProps {
-  title?: string;
-  totalSteps?: number;
-  currentStep?: number;
-  onScrollUp: () => void;
-  onScrollDown: () => void;
-}
-
-const TaskPaginationSection: React.FC<TaskPaginationSectionProps> = ({
-  title,
-  totalSteps,
-  currentStep,
-  onScrollUp,
-  onScrollDown,
-}) => {
-  return (
-    <div className="right-0 z-10 fixed h-[90vh] w-[122px] pt-10 pb-[60px] pr-[32px] bg-center bg-no-repeat bg-fixed bg-opacity-50">
-      <p
-        className={`text-[12px] ${
-          title?.toLocaleLowerCase() == "congratulations" && "text-white"
-        } text-colors-primarypurpurple opacity-45 text-end pb-[12px]`}
-      >
-        {title}
-      </p>
-      <div className="flex justify-end items-end gap-2 w-full">
-        <div className="grid grid-flow-row gap-2 w-[37px]">
-          {title !== "" && totalSteps !== undefined && currentStep !== undefined
-            ? Array.from({ length: totalSteps }).map((_, index) =>
-                title?.toLocaleLowerCase() === "congratulations" ? (
-                  <div
-                    key={index}
-                    className={`h-1 w-full rounded-[1px] ${
-                      index === currentStep - 1
-                        ? "bg-white"
-                        : "bg-white opacity-40"
-                    }`}
-                  ></div>
-                ) : (
-                  <div
-                    key={index}
-                    className={`h-1 w-full rounded-[1px] ${
-                      index === currentStep - 1
-                        ? "bg-colors-primarypurpurple opacity-45 "
-                        : "bg-colors-primarypurpurple opacity-10"
-                    }`}
-                  ></div>
-                )
-              )
-            : ""}
-        </div>
-      </div>
-      {currentStep !== undefined && currentStep > 1 && (
-        <div className="absolute z-30 bottom-10 right-10">
-          <div className=" grid-cols-2 relative z-50  grid w-max flex-col justify-end items-end bg-colors-buttonNav bg-opacity-20 rounded-[4px]">
-            <Button
-              onClick={onScrollUp}
-              className=" w-[40px] h-[40px] rounded-l-[4px] rounded-r-none bg-transparent border border-colors-buttonNav border-opacity-30 hover:bg-colors-buttonNav hover:bg-opacity-30"
-            >
-              <FaCaretUp
-                height={24}
-                width={24}
-                color="#5C28DF"
-                className=" w-[40px] h-[40px] rounded-[4px] bg-transparent"
-              />
-            </Button>
-            <Button
-              onClick={onScrollDown}
-              className=" w-[40px] h-[40px] rounded-r-[4px] rounded-l-none bg-transparent border border-colors-buttonNav border-opacity-30 hover:bg-colors-buttonNav hover:bg-opacity-30"
-            >
-              <FaCaretDown
-                height={24}
-                width={24}
-                color="#5C28DF"
-                className=" w-[40px] h-[40px] rounded-[4px] bg-transparent"
-              />
-            </Button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};

@@ -5,16 +5,11 @@ import { Label } from "@/src/components/ui/label";
 import { Input } from "@/src/components/ui/input";
 import { Button } from "@/src/components/ui/button";
 import { useRouter } from "next/navigation";
-import {
-  useForgotPasswordMutation,
-  useVerifyPasscodeMutation,
-} from "@/store/services/authManagement";
 import { Card, CardContent } from "@/src/components/ui/card";
-import { setToken } from "@/store/slices/tokenSlice";
 import { useDispatch } from "react-redux";
-import { setCookie } from "@/src/utils/auth";
 import Footer from "@/src/components/spacce-footer";
 import Navbar from "@/src/components/navbar";
+import { useForgotPasswordMutation, useValidateCodeMutation } from "@/src/services/authManagement";
 
 export default function ForgotPasswordPage() {
   // Step 1: Email and OrgCode form
@@ -30,7 +25,7 @@ export default function ForgotPasswordPage() {
   const [currentStep, setCurrentStep] = useState(1); // 1: email/orgCode, 2: passcode verification
 
   const [forgotPassword, forgotPasswordProps] = useForgotPasswordMutation();
-  const [verifyPasscode, verifyPasscodeProps] = useVerifyPasscodeMutation();
+  const [verifyPasscode, verifyPasscodeProps] = useValidateCodeMutation();
   const router = useRouter();
   const dispatch = useDispatch();
 
