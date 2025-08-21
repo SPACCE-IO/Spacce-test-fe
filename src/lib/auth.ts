@@ -34,7 +34,7 @@ declare module "next-auth" {
   }
 }
 
-const API_BASE_URL = "https://dev-spacce.spacce.io";
+const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [

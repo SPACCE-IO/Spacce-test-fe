@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import PdfViewer from "@/src/components/PdfViewer";
+import PdfViewer from "@/src/components/mission/PdfViewer";
 import { QuestionRenderer } from "@/src/components/questions/QuestionRenderer";
 import { useSession } from "next-auth/react";
 import { useLogResponseMutation } from "@/src/services/missionManagement";
@@ -249,14 +249,10 @@ const PdfQuestions = ({
 
     if (allQuestionsCorrect) {
       setMissionStatus(2);
-      setTimeout(() => {
-        router.push("/congratulation");
-      }, 2000);
+      router.push("/congratulation");
     } else {
       setMissionStatus(1);
-      setTimeout(() => {
-        router.push("/mission-fail");
-      }, 2000);
+      router.push("/mission-fail");
     }
   };
 
@@ -358,7 +354,7 @@ const PdfQuestions = ({
     if (missionType === "PDF_MISSION") {
       return (
         <div className="w-full h-full min-h-[600px]">
-          <PdfViewer url={missionFile || ""} />
+          <PdfViewer toggleDrawer={()=> setIsDrawerOpen(!isDrawerOpen)} url={'https://spacce-dev-store.s3.eu-west-1.amazonaws.com/file-sample_150kB.pdf'} />
         </div>
       );
     } else if (missionType === "VIDEO_MISSION") {
@@ -455,13 +451,13 @@ const PdfQuestions = ({
               {/* Content here */}
               <div className="aspect-video rounded-[15px] flex items-center justify-center relative">
                 {renderContent()}
-                <button
+                {/* <button
                   onClick={toggleDrawer}
                   className="absolute bottom-4 right-4 p-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
                   aria-label="Open fullscreen"
                 >
                   <Maximize2 className="w-5 h-5" />
-                </button>
+                </button> */}
               </div>
             </div>
           </div>

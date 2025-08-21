@@ -1,16 +1,11 @@
 // @ts-nocheck
 import { apiSlice } from "../slices/apiSlice";
 
-interface Group {
-  id: number;
-  name: string;
-}
-const devBaseUrl = 'http://localhost:3001'
 export const associationApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getGroupById: builder.query({
       query: ({ authToken, id }) => ({
-        url: `${devBaseUrl}/association/api/v1/group/${id}`,
+        url: `/association/api/v1/group/${id}`,
         method: "GET",
         headers: { Authorization: authToken },
       }),
@@ -19,7 +14,7 @@ export const associationApi = apiSlice.injectEndpoints({
     addGroup: builder.mutation({
       query: ({ body, authToken }) => {
         return {
-          url: `${devBaseUrl}/association/api/v1/group`,
+          url: `/association/api/v1/group`,
           method: "POST",
           body,
           headers: {
@@ -32,7 +27,7 @@ export const associationApi = apiSlice.injectEndpoints({
     }),
     updateGroup: builder.mutation({
       query: ({ authToken, id, body }) => ({
-        url: `${devBaseUrl}/association/api/v1/group/${id}`,
+        url: `/association/api/v1/group/${id}`,
         method: "PUT",
         body,
         headers: { Authorization: authToken },
@@ -42,7 +37,7 @@ export const associationApi = apiSlice.injectEndpoints({
     }),
     addPhase: builder.mutation({
       query: ({ authToken, body }) => ({
-        url: `${devBaseUrl}/association/api/v1/phase`,
+        url: `/association/api/v1/phase`,
         method: "POST",
         body,
         headers: {
@@ -54,7 +49,7 @@ export const associationApi = apiSlice.injectEndpoints({
     }),
     updatePhase: builder.mutation({
       query: ({ body, authToken, id }) => ({
-        url: `${devBaseUrl}/association/api/v1/phase/${id}`,
+        url: `/association/api/v1/phase/${id}`,
         method: "PUT",
         body,
         headers: { Authorization: authToken },
@@ -64,7 +59,7 @@ export const associationApi = apiSlice.injectEndpoints({
     }),
     getPhaseById: builder.query({
       query: ({ id, authToken }) => ({
-        url: `${devBaseUrl}/association/api/v1/phase/${id}`,
+        url: `/association/api/v1/phase/${id}`,
         method: "GET",
         headers: { Authorization: authToken },
       }),
@@ -72,7 +67,7 @@ export const associationApi = apiSlice.injectEndpoints({
     }),
     addDepartment: builder.mutation({
       query: ({ body, authToken }) => ({
-        url: `${devBaseUrl}/association/api/v1/department`,
+        url: `/association/api/v1/department`,
         method: "POST",
         body,
         headers: { Authorization: authToken },
@@ -82,7 +77,7 @@ export const associationApi = apiSlice.injectEndpoints({
     }),
     updateDepartment: builder.mutation({
       query: ({ body, authToken, id }) => ({
-        url: `${devBaseUrl}/association/api/v1/department/${id}`,
+        url: `/association/api/v1/department/${id}`,
         method: "PUT",
         body,
         headers: { Authorization: authToken },
@@ -92,7 +87,7 @@ export const associationApi = apiSlice.injectEndpoints({
     }),
     getDepartmentById: builder.query({
       query: ({ authToken, id }) => ({
-        url: `${devBaseUrl}/association/api/v1/department/${id}`,
+        url: `/association/api/v1/department/${id}`,
         method: "GET",
         headers: { Authorization: authToken },
       }),
@@ -100,7 +95,7 @@ export const associationApi = apiSlice.injectEndpoints({
     }),
     addMissionToPhase: builder.mutation({
       query: ({ body, authToken, id }) => ({
-        url: `${devBaseUrl}/association/api/v1/phase/${id}/mission`,
+        url: `/association/api/v1/phase/${id}/mission`,
         method: "POST",
         body,
         headers: { Authorization: authToken },
@@ -109,7 +104,7 @@ export const associationApi = apiSlice.injectEndpoints({
     }),
     addUserToGroup: builder.mutation({
       query: ({ body, authToken, id }) => ({
-        url: `${devBaseUrl}/association/api/v1/group/${id}/user`,
+        url: `/association/api/v1/group/${id}/user`,
         method: "POST",
         body,
         headers: { Authorization: authToken },
@@ -118,7 +113,7 @@ export const associationApi = apiSlice.injectEndpoints({
     }),
     addDepartmentToGroup: builder.mutation({
       query: ({ body, authToken, id }) => ({
-        url: `${devBaseUrl}/association/api/v1/group/${id}/department`,
+        url: `/association/api/v1/group/${id}/department`,
         method: "POST",
         body,
         headers: { Authorization: authToken },
@@ -127,7 +122,7 @@ export const associationApi = apiSlice.injectEndpoints({
     }),
     addPhaseToDepartment: builder.mutation({
       query: ({ body, authToken, id }) => ({
-        url: `${devBaseUrl}/association/api/v1/department/${id}/phase`,
+        url: `/association/api/v1/department/${id}/phase`,
         method: "POST",
         body,
         headers: { Authorization: authToken },

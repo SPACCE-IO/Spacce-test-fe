@@ -1,1 +1,0 @@
-const currentResponse = "Successfully updated user profile"

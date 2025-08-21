@@ -1,15 +1,11 @@
 // @ts-nocheck
-
 import { apiSlice } from "../slices/apiSlice";
-// const devBaseUrl = 'http://localhost:3006'
-const devBaseUrl = "https://dev-spacce.spacce.io";
-
 
 export const workspaceManagementApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     addWorkspace: builder.mutation({
       query: ({ body, authToken }) => ({
-        url: `${devBaseUrl}/workspace/api/v1/workspace`,
+        url: `/workspace/api/v1/workspace`,
         method: "POST",
         body,
         headers: { Authorization: authToken },
@@ -19,7 +15,7 @@ export const workspaceManagementApi = apiSlice.injectEndpoints({
     }),
     updateWorkspace: builder.mutation({
       query: ({ authToken, id, body }) => ({
-        url: `${devBaseUrl}/workspace/api/v1/workspace/${id}`,
+        url: `/workspace/api/v1/workspace/${id}`,
         method: "PUT",
         body,
         headers: {
@@ -31,7 +27,7 @@ export const workspaceManagementApi = apiSlice.injectEndpoints({
     }),
     getWorkspace: builder.query({
       query: (authToken) => ({
-        url: `${devBaseUrl}/workspace/api/v1/workspace`,
+        url: `/workspace/api/v1/workspace`,
         method: "GET",
         headers: {
           Authorization: authToken,
@@ -41,7 +37,7 @@ export const workspaceManagementApi = apiSlice.injectEndpoints({
     }),
     getWorkspaceById: builder.query({
       query: ({ authToken, id }) => ({
-        url: `${devBaseUrl}/workspace/api/v1/workspace/${id}`,
+        url: `/workspace/api/v1/workspace/${id}`,
         method: "GET",
         headers: {
           Authorization: authToken,
@@ -51,7 +47,7 @@ export const workspaceManagementApi = apiSlice.injectEndpoints({
     }),
     getWorkspaceGroups: builder.query({
       query: ({ id, authToken }) => ({
-        url: `${devBaseUrl}/workspace/api/v1/workspace/${id}/group`,
+        url: `/workspace/api/v1/workspace/${id}/group`,
         method: "GET",
         headers: { Authorization: authToken },
       }),
@@ -59,7 +55,7 @@ export const workspaceManagementApi = apiSlice.injectEndpoints({
     }),
     getWorkspaceMissions: builder.query({
       query: ({ id, authToken }) => ({
-        url: `${devBaseUrl}/workspace/api/v1/workspace/${id}/mission`,
+        url: `/workspace/api/v1/workspace/${id}/mission`,
         method: "GET",
         headers: { Authorization: authToken },
       }),
@@ -67,7 +63,7 @@ export const workspaceManagementApi = apiSlice.injectEndpoints({
     }),
     getWorkspacePhases: builder.query({
       query: ({ id, authToken }) => ({
-        url: `${devBaseUrl}/workspace/api/v1/workspace/${id}/phase`,
+        url: `/workspace/api/v1/workspace/${id}/phase`,
         method: "GET",
         headers: { Authorization: authToken },
       }),
@@ -75,7 +71,7 @@ export const workspaceManagementApi = apiSlice.injectEndpoints({
     }),
     getWorkspaceDepartments: builder.query({
       query: ({ id, authToken }) => ({
-        url: `${devBaseUrl}/workspace/api/v1/workspace/${id}/department`,
+        url: `/workspace/api/v1/workspace/${id}/department`,
         method: "GET",
         headers: { Authorization: authToken },
       }),

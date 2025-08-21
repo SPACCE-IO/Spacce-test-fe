@@ -1,5 +1,0 @@
-const currentResponse = {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwLCJ1c2VyTmFtZSI6InRzaHdhbmVpeWpoZ2xvQHhpcXVlbGdyb3VwLmNvbSIsIm9yZ0NvZGUiOiJ0ZXN0Iiwicm9sZSI6IlIiLCJwYXNzd29yZEV4cGlyZWQiOjAsImlhdCI6MTc1MzM1MDQ4NiwiZXhwIjoxNzUzMzU0MDg2LCJhdWQiOiJzcGFjY2UtdXNlcnMiLCJpc3MiOiJzcGFjY2UtYXV0aCJ9.LbKSbiS9KoLZ8DBF5U1SX1PamGw4Nl0xESuckv3tndA",
-    "external_user_id": null,
-    "passwordExpired": "0"
-}

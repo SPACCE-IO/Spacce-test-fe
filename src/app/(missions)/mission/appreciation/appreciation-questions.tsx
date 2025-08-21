@@ -385,31 +385,6 @@ const AppreciationQuestions = ({
                   </p>
                 )}
 
-                {/* Show response message */}
-                {showResponse && responseMessage && (
-                  <div
-                    className={`mb-4 p-3 rounded-md flex justify-between items-center ${
-                      responseMessage.includes("correct") ||
-                      responseMessage.includes("Correct")
-                        ? "bg-green-100 text-green-800 border border-green-300"
-                        : "bg-red-100 text-red-800 border border-red-300"
-                    }`}
-                  >
-                    <span>{responseMessage}</span>
-                    {/* Add retry button for incorrect answers */}
-                    {!responseMessage.includes("correct") &&
-                      !responseMessage.includes("Correct") && (
-                        <Button
-                          onClick={handleRetryQuestion}
-                          variant="outline"
-                          size="sm"
-                          className="ml-2 text-xs"
-                        >
-                          Try Again
-                        </Button>
-                      )}
-                  </div>
-                )}
 
                 {currentQuestion.hint && (
                   <div className="mb-4">

@@ -24,12 +24,10 @@ import { cn } from "@/src/lib/utils";
 import { useRouter } from "next/navigation";
 
 //profile icons
-import Profile1 from "@/public/assets/profilepics/profile1.svg";
-import Profile2 from "@/public/assets/profilepics/profile2.svg";
-import Profile3 from "@/public/assets/profilepics/profile3.svg";
-import Profile4 from "@/public/assets/profilepics/profile4.svg";
-import Profile5 from "@/public/assets/profilepics/profile5.svg";
 import Profile6 from "@/public/assets/profilepics/profile6.png";
+import Profile2 from "@/public/assets/profilepics/one.jpg";
+import Profile3 from "@/public/assets/profilepics/two.png";
+import Profile4 from "@/public/assets/profilepics/three.png";
 import Navbar from "@/src/components/navbar";
 import { useUpdateProfileMutation,useLazyGetProfileQuery } from "@/src/services/userManagement";
 import { useSession } from "next-auth/react";
@@ -277,12 +275,7 @@ const {data:session} = useSession()
   };
 
   const profilePics = [
-    Profile1,
-    Profile2,
-    Profile3,
-    Profile4,
-    Profile5,
-    Profile6,
+    Profile6,Profile2,Profile3,Profile4
   ];
   const avatars = Array(profilePics.length).fill(null);
 

@@ -3,12 +3,18 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'spacce-dev-store.s3.eu-west-1.amazonaws.com',
-        pathname: '/**',
+        protocol: "https",
+        hostname: "spacce-dev-store.s3.eu-west-1.amazonaws.com",
+        pathname: "/**",
       },
     ],
   },

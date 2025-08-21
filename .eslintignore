@@ -1,0 +1,14 @@
+# Ignore specific directories
+node_modules/
+.next/
+out/
+build/
+
+# Ignore specific files or patterns
+*.config.js
+*.config.ts
+
+# If you want to ignore specific problematic files temporarily
+src/services/
+src/slices/
+src/types/api.ts

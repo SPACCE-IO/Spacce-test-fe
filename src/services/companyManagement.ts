@@ -1,14 +1,11 @@
 // @ts-nocheck
 import { apiSlice } from "../slices/apiSlice";
-// const devBaseUrl = 'http://localhost:3002'
-const devBaseUrl = "https://dev-spacce.spacce.io";
-
 
 export const companyApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     addCompany: builder.mutation({
       query: ({ body, authToken }) => ({
-        url: `${devBaseUrl}/company/api/v1/company`,
+        url: `/company/api/v1/company`,
         method: "POST",
         body,
         headers: { Authorization: authToken },
@@ -16,7 +13,7 @@ export const companyApi = apiSlice.injectEndpoints({
     }),
     updateCompany: builder.mutation({
       query: ({ body, authToken, orgCode }) => ({
-        url: `${devBaseUrl}/company/api/v1/company/${orgCode}`,
+        url: `/company/api/v1/company/${orgCode}`,
         method: "PUT",
         body,
         headers: {
@@ -26,14 +23,14 @@ export const companyApi = apiSlice.injectEndpoints({
     }),
     getCompanies: builder.query({
       query: (authToken) => ({
-        url: `${devBaseUrl}/company/api/v1/company`,
+        url: `/company/api/v1/company`,
         method: "GET",
         headers: { Authorization: authToken },
       }),
     }),
     getCompanyById: builder.query({
       query: ({ authToken, userId }) => ({
-        url: `${devBaseUrl}/company/api/v1/company/${userId}`,
+        url: `/company/api/v1/company/${userId}`,
         method: "GET",
         headers: {
           Authorization: authToken,
@@ -42,7 +39,7 @@ export const companyApi = apiSlice.injectEndpoints({
     }),
     addIdentity: builder.mutation({
       query: ({ body, authToken, id }) => ({
-        url: `${devBaseUrl}/company/api/v1/company/${id}/identity`,
+        url: `/company/api/v1/company/${id}/identity`,
         method: "POST",
         body,
         headers: { Authorization: authToken },
@@ -52,7 +49,7 @@ export const companyApi = apiSlice.injectEndpoints({
     }),
     updateIdentity: builder.mutation({
       query: ({ body, id, authToken }) => ({
-        url: `${devBaseUrl}/company/api/v1/company/${id}/identity`,
+        url: `/company/api/v1/company/${id}/identity`,
         method: "PUT",
         body,
         headers: { Authorization: authToken },
@@ -62,7 +59,7 @@ export const companyApi = apiSlice.injectEndpoints({
     }),
     addLanguage: builder.mutation({
       query: ({ body, authToken, orgCode }) => ({
-        url: `${devBaseUrl}/company/api/v1/company/${orgCode}/language`,
+        url: `/company/api/v1/company/${orgCode}/language`,
         method: "POST",
         body,
         headers: { Authorization: authToken },
@@ -71,7 +68,7 @@ export const companyApi = apiSlice.injectEndpoints({
     }),
     getLanguages: builder.query({
       query: ({ authToken, orgCode }) => ({
-        url: `${devBaseUrl}/company/api/v1/company/${orgCode}/language`,
+        url: `/company/api/v1/company/${orgCode}/language`,
         method: "GET",
         headers: { Authorization: authToken },
       }),
@@ -79,7 +76,7 @@ export const companyApi = apiSlice.injectEndpoints({
     }),
     getIdentity: builder.query({
       query: ({ id, authToken }) => ({
-        url: `${devBaseUrl}/company/api/v1/company/${id}/identity`,
+        url: `/company/api/v1/company/${id}/identity`,
         method: "GET",
         headers: { Authorization: authToken },
       }),
@@ -87,7 +84,7 @@ export const companyApi = apiSlice.injectEndpoints({
     }),
     updateLanguage: builder.mutation({
       query: ({ body, authToken, id }) => ({
-        url: `${devBaseUrl}/company/api/v1/company/language/${id}`,
+        url: `/company/api/v1/company/language/${id}`,
         method: "PUT",
         body,
         headers: { Authorization: authToken },

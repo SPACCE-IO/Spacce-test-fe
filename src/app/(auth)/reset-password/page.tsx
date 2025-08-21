@@ -6,16 +6,13 @@ import { Input } from "@/src/components/ui/input";
 import { Button } from "@/src/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDispatch } from "react-redux";
-import {
-  useLazyGetProfileQuery,
-  useResetPasswordMutation,
-} from "@/store/services/userManagement";
-import { setToken } from "@/store/slices/tokenSlice";
-import { setProfile } from "@/store/slices/profileSlice";
-import { getAuthToken, setCookie } from "@/src/utils/auth";
 import { Card, CardContent } from "@/src/components/ui/card";
 import Navbar from "@/src/components/navbar";
 import Footer from "@/src/components/spacce-footer";
+import {
+  useLazyGetProfileQuery,
+  useResetPasswordMutation,
+} from "@/src/services/userManagement";
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState("");
@@ -75,15 +72,6 @@ export default function ResetPasswordPage() {
   useEffect(() => {
     if (getProfileProps.isSuccess && getProfileProps.data) {
       const profileData = getProfileProps.data;
-
-      // Store profile data in Redux
-      dispatch(setProfile(profileData));
-
-      // Set user info
-      dispatch(setProfile(profileData));
-
-      // Store token in Redux
-      dispatch(setToken(token));
 
       // Navigate to dashboard or intended page
       const redirectTo = searchParams.get("redirect") || "/dashboard";
@@ -185,38 +173,6 @@ export default function ResetPasswordPage() {
               )}
 
               <div className="space-y-4">
-                {/* <div className="space-y-2">
-                  <Label htmlFor="email" className="text-gray-300 text-base">
-                    Email
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="bg-[#5C5C5F] rounded-[6px] border-gray-500 text-white h-[40px] text-[16px]"
-                    placeholder="Enter your email"
-                    required
-                    disabled={true} // Always disabled since it comes from URL
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="orgCode" className="text-gray-300 text-base">
-                    Organization Code
-                  </Label>
-                  <Input
-                    id="orgCode"
-                    type="text"
-                    value={orgCode}
-                    onChange={(e) => setOrgCode(e.target.value)}
-                    className="bg-[#5C5C5F] rounded-[6px] border-gray-500 text-white h-[40px] text-[16px]"
-                    placeholder="Enter organization code"
-                    required
-                    disabled={true} // Always disabled since it comes from URL
-                  />
-                </div> */}
-
                 <div className="space-y-2">
                   <Label
                     htmlFor="newPassword"

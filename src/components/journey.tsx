@@ -6,7 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Button } from "@/src/components/ui/button";
 import localFont from "next/font/local";
 import { useRouter } from "next/navigation";
-import Footer from "@/app/components/spacce-footer";
+import Footer from "./spacce-footer";
 
 const myFont = localFont({ src: "../fonts/Satoshi-Medium.woff" });
 const myFontRegular = localFont({ src: "../fonts/Satoshi-Regular.woff" });

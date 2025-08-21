@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { ChevronLeft, ChevronRight, Scan, } from "lucide-react";
+import { ChevronLeft, ChevronRight, Scan, ZoomIn, ZoomOut } from "lucide-react";
 
 // Extend Window interface for PDF.js
 declare global {
@@ -12,7 +12,7 @@ declare global {
 
 interface PdfViewerProps {
   url: string;
-  toggleDrawer:()=> void
+  toggleDrawer: () => void;
 }
 
 const PdfViewer = ({ url, toggleDrawer }: PdfViewerProps) => {
@@ -24,9 +24,11 @@ const PdfViewer = ({ url, toggleDrawer }: PdfViewerProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [isRendering, setIsRendering] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const renderTaskRef = useRef<any>(null); // Store current render task
+  const renderTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Determine if URL is absolute or relative
   const pdfUrl = url.startsWith("http")
@@ -36,6 +38,10 @@ const PdfViewer = ({ url, toggleDrawer }: PdfViewerProps) => {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const handleToogle =()=>{
+    toggleDrawer()
+  }
 
   // Load PDF.js
   useEffect(() => {
@@ -83,56 +89,78 @@ const PdfViewer = ({ url, toggleDrawer }: PdfViewerProps) => {
     loadPdfJs();
   }, [isClient, pdfUrl]);
 
+  // Centralized render function with debouncing
+  const renderPage = async () => {
+    if (!pdfDoc || !canvasRef.current || !containerRef.current || isRendering)
+      return;
+
+    // Clear any pending render timeout
+    if (renderTimeoutRef.current) {
+      clearTimeout(renderTimeoutRef.current);
+      renderTimeoutRef.current = null;
+    }
+
+    setIsRendering(true);
+
+    try {
+      // Cancel any ongoing render task
+      if (renderTaskRef.current) {
+        renderTaskRef.current.cancel();
+        renderTaskRef.current = null;
+      }
+
+      const page = await pdfDoc.getPage(currentPage);
+      const canvas = canvasRef.current!;
+      const context = canvas.getContext("2d")!;
+      const container = containerRef.current!;
+
+      // Calculate scale to fit container width
+      const containerWidth = container.clientWidth - 32; // Account for padding
+      const viewport = page.getViewport({ scale: 1 });
+      const scaleToFit = containerWidth / viewport.width;
+
+      const scaledViewport = page.getViewport({ scale: scaleToFit * scale });
+
+      canvas.height = scaledViewport.height;
+      canvas.width = scaledViewport.width;
+
+      // Clear the canvas before rendering
+      context.clearRect(0, 0, canvas.width, canvas.height);
+
+      const renderContext = {
+        canvasContext: context,
+        viewport: scaledViewport,
+      };
+
+      // Store the render task so we can cancel it if needed
+      renderTaskRef.current = page.render(renderContext);
+
+      await renderTaskRef.current.promise;
+
+      // Clear the reference after successful render
+      renderTaskRef.current = null;
+    } catch (err) {
+      // Don't log cancelled render operations as errors
+      if (err?.name !== "RenderingCancelledException") {
+        console.error("Error rendering page:", err);
+      }
+    } finally {
+      setIsRendering(false);
+    }
+  };
+
+  // Debounced render function for resize events
+  const debouncedRenderPage = () => {
+    if (renderTimeoutRef.current) {
+      clearTimeout(renderTimeoutRef.current);
+    }
+    renderTimeoutRef.current = setTimeout(() => {
+      renderPage();
+    }, 100);
+  };
+
   // Render current page
   useEffect(() => {
-    if (!pdfDoc || !canvasRef.current || !containerRef.current) return;
-
-    const renderPage = async () => {
-      try {
-        // Cancel any ongoing render task
-        if (renderTaskRef.current) {
-          renderTaskRef.current.cancel();
-          renderTaskRef.current = null;
-        }
-
-        const page = await pdfDoc.getPage(currentPage);
-        const canvas = canvasRef.current!;
-        const context = canvas.getContext("2d")!;
-        const container = containerRef.current!;
-
-        // Calculate scale to fit container width
-        const containerWidth = container.clientWidth - 32; // Account for padding
-        const viewport = page.getViewport({ scale: 1 });
-        const scaleToFit = containerWidth / viewport.width;
-
-        const scaledViewport = page.getViewport({ scale: scaleToFit * scale });
-
-        canvas.height = scaledViewport.height;
-        canvas.width = scaledViewport.width;
-
-        // Clear the canvas before rendering
-        context.clearRect(0, 0, canvas.width, canvas.height);
-
-        const renderContext = {
-          canvasContext: context,
-          viewport: scaledViewport,
-        };
-
-        // Store the render task so we can cancel it if needed
-        renderTaskRef.current = page.render(renderContext);
-
-        await renderTaskRef.current.promise;
-
-        // Clear the reference after successful render
-        renderTaskRef.current = null;
-      } catch (err) {
-        // Don't log cancelled render operations as errors
-        if (err?.name !== "RenderingCancelledException") {
-          console.error("Error rendering page:", err);
-        }
-      }
-    };
-
     renderPage();
 
     // Cleanup function to cancel render on unmount or dependency change
@@ -149,62 +177,19 @@ const PdfViewer = ({ url, toggleDrawer }: PdfViewerProps) => {
     if (!containerRef.current) return;
 
     const resizeObserver = new ResizeObserver(() => {
-      // Re-render when container size changes
-      if (pdfDoc && canvasRef.current) {
-        const renderPage = async () => {
-          try {
-            // Cancel any ongoing render task
-            if (renderTaskRef.current) {
-              renderTaskRef.current.cancel();
-              renderTaskRef.current = null;
-            }
-
-            const page = await pdfDoc.getPage(currentPage);
-            const canvas = canvasRef.current!;
-            const context = canvas.getContext("2d")!;
-            const container = containerRef.current!;
-
-            const containerWidth = container.clientWidth - 32;
-            const viewport = page.getViewport({ scale: 1 });
-            const scaleToFit = containerWidth / viewport.width;
-
-            const scaledViewport = page.getViewport({
-              scale: scaleToFit * scale,
-            });
-
-            canvas.height = scaledViewport.height;
-            canvas.width = scaledViewport.width;
-
-            // Clear the canvas before rendering
-            context.clearRect(0, 0, canvas.width, canvas.height);
-
-            const renderContext = {
-              canvasContext: context,
-              viewport: scaledViewport,
-            };
-
-            // Store the render task so we can cancel it if needed
-            renderTaskRef.current = page.render(renderContext);
-
-            await renderTaskRef.current.promise;
-
-            // Clear the reference after successful render
-            renderTaskRef.current = null;
-          } catch (err) {
-            // Don't log cancelled render operations as errors
-            if (err?.name !== "RenderingCancelledException") {
-              console.error("Error rendering page:", err);
-            }
-          }
-        };
-        renderPage();
-      }
+      // Use debounced render for resize events to prevent rapid-fire renders
+      debouncedRenderPage();
     });
 
     resizeObserver.observe(containerRef.current);
 
     return () => {
       resizeObserver.disconnect();
+      // Clear any pending timeouts
+      if (renderTimeoutRef.current) {
+        clearTimeout(renderTimeoutRef.current);
+        renderTimeoutRef.current = null;
+      }
       // Cancel any ongoing render task when component unmounts
       if (renderTaskRef.current) {
         renderTaskRef.current.cancel();
@@ -323,35 +308,15 @@ const PdfViewer = ({ url, toggleDrawer }: PdfViewerProps) => {
         <ChevronRight className="w-4 h-4" />
       </button>
 
-      {/* Top Navigation Overlay */}
+      {/* Bottom Navigation Overlay */}
       <div
         className={`absolute bottom-0 w-full left-1/2 transform -translate-x-1/2 transition-all duration-300 z-10 ${
           isHovered ? "opacity-100" : "opacity-0"
         }`}
         style={{ pointerEvents: isHovered ? "auto" : "none" }}
+        onMouseEnter={() => setIsHovered(true)}
       >
         <div className="flex items-center space-x-4 bg-black bg-opacity-70 text-white px-6 py-3 backdrop-blur-sm">
-          {/* Zoom Controls */}
-          {/* <button
-            onClick={zoomOut}
-            className="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-colors"
-            title="Zoom Out"
-          >
-            <ZoomOut className="w-4 h-4" />
-          </button>
-
-          <span className="text-sm font-medium whitespace-nowrap">
-            {Math.round(scale * 100)}%
-          </span>
-
-          <button
-            onClick={zoomIn}
-            className="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-colors"
-            title="Zoom In"
-          >
-            <ZoomIn className="w-4 h-4" />
-          </button> */}
-
           {/* Page Info */}
           <span className="text-sm font-medium whitespace-nowrap">
             {currentPage} / {totalPages}
@@ -377,11 +342,14 @@ const PdfViewer = ({ url, toggleDrawer }: PdfViewerProps) => {
               />
             </div>
           </div>
+
           <div className="w-px h-6 bg-white bg-opacity-30"></div>
+
+          {/* Toggle Drawer Button */}
           <button
-            onClick={()=>toggleDrawer()}
+            onClick={handleToogle}
             className="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-colors"
-            title="Zoom In"
+            title="Open Scanner"
           >
             <Scan className="w-4 h-4" />
           </button>

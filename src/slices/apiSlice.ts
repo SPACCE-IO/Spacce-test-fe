@@ -3,10 +3,8 @@ import {
   createApi,
   FetchBaseQueryError,
 } from "@reduxjs/toolkit/query/react";
-import { error } from "console";
 import { signOut } from "next-auth/react";
 
-// Define types for API responses
 interface ApiResponse {
   error?: string;
   message?: string;
@@ -28,14 +26,12 @@ interface QueryResult {
 
 // Base query setup
 const baseQuery = fetchBaseQuery({
-  baseUrl: '',
-  // baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
+  baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
   prepareHeaders: (headers) => {
     return headers;
   },
 });
 
-// Wrapper for the base query to standardize error handling
 const baseQueryWithStandardizedErrors = async (
   args: any,
   api: any,
@@ -43,7 +39,6 @@ const baseQueryWithStandardizedErrors = async (
 ): Promise<{ data?: any; error?: StandardizedError }> => {
   const result = (await baseQuery(args, api, extraOptions)) as QueryResult;
 
-  // Handle HTTP-level errors (status codes >= 400)
   if (result.error) {
   
     if(result.error.status === 401){
@@ -60,8 +55,6 @@ const baseQueryWithStandardizedErrors = async (
     };
   }
 
-  // Handle API-level errors ONLY if there's an error field
-  // or if the status code indicates an error
   const data = result.data as ApiResponse;
   if (data?.error || (data?.statusCode && data?.statusCode >= 400)) {
      
@@ -73,11 +66,9 @@ const baseQueryWithStandardizedErrors = async (
     };
   }
 
-  // Return successful data, even if it contains a message field
   return { data: result.data };
 };
 
-// Create the API slice
 export const apiSlice = createApi({
   baseQuery: baseQueryWithStandardizedErrors,
   tagTypes: [

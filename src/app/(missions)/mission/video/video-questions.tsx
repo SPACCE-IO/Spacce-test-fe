@@ -249,14 +249,10 @@ const VideoQuestions = ({
 
     if (allQuestionsCorrect) {
       setMissionStatus(2);
-      setTimeout(() => {
-        router.push("/congratulation");
-      }, 2000);
+      router.push("/congratulation");
     } else {
       setMissionStatus(1);
-      setTimeout(() => {
-        router.push("/mission-fail");
-      }, 2000);
+      router.push("/mission-fail");
     }
   };
 

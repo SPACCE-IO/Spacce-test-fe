@@ -1,13 +1,11 @@
 // @ts-nocheck
-
 import { apiSlice } from "../slices/apiSlice";
-const devBaseUrl = "https://dev-spacce.spacce.io";
 
 export const userManagementApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     resetPassword: builder.mutation({
       query: ({ data, authToken }) => ({
-        url: `${devBaseUrl}/user/api/v1/profile/password`,
+        url: `/user/api/v1/profile/password`,
         method: "PATCH",
         body: data,
         headers: { Authorization: authToken },
@@ -15,7 +13,7 @@ export const userManagementApi = apiSlice.injectEndpoints({
     }),
     setNewPassword: builder.mutation({
       query: ({ body, authToken }) => ({
-        url: `${devBaseUrl}/user/api/v1/profile/password`,
+        url: `/user/api/v1/profile/password`,
         method: "PATCH",
         body,
         headers: { Authorization: authToken },
@@ -23,7 +21,7 @@ export const userManagementApi = apiSlice.injectEndpoints({
     }),
     getProfile: builder.query({
       query: (authToken) => ({
-        url: `${devBaseUrl}/user/api/v1/profile`,
+        url: `/user/api/v1/profile`,
         method: "GET",
         headers: {
           Authorization: authToken,
@@ -32,7 +30,7 @@ export const userManagementApi = apiSlice.injectEndpoints({
     }),
     updateProfile: builder.mutation({
       query: ({ body, authToken }) => ({
-        url: `${devBaseUrl}/user/api/v1/profile`,
+        url: `/user/api/v1/profile`,
         method: "PUT",
         body,
         headers: {
@@ -43,7 +41,7 @@ export const userManagementApi = apiSlice.injectEndpoints({
     }),
     getDashboard: builder.query({
       query: (authToken) => ({
-        url: `${devBaseUrl}/user/api/v1/dashboard`,
+        url: `/user/api/v1/dashboard`,
         method: "GET",
         headers: {
           Authorization: authToken,
@@ -52,14 +50,14 @@ export const userManagementApi = apiSlice.injectEndpoints({
     }),
     getPage: builder.query({
       query: ({ userName, authToken }) => ({
-        url: `${devBaseUrl}/employee/user/${userName}`,
+        url: `/employee/user/${userName}`,
         method: "GET",
         headers: { Authorization: authToken },
       }),
     }),
     getBackPack: builder.query({
       query: (authToken) => ({
-        url: `${devBaseUrl}/user/api/v1/backpack`,
+        url: `/user/api/v1/backpack`,
         method: "GET",
         headers: { Authorization: authToken },
       }),
@@ -75,5 +73,5 @@ export const {
   useGetPageQuery,
   useGetBackPackQuery,
   useSetNewPasswordMutation,
-  useLazyGetProfileQuery
+  useLazyGetProfileQuery,
 } = userManagementApi;
