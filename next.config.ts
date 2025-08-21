@@ -9,8 +9,22 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  experimental: {
-    serverComponentsExternalPackages: ["next-auth"],
+  // Remove experimental config that might cause issues
+  // experimental: {
+  //   serverComponentsExternalPackages: ["next-auth"],
+  // },
+  // Fix for AWS Amplify build issues
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals = config.externals || [];
+      config.externals.push("next-auth");
+    }
+    
+    config.module.rules.push({
+      test: /\.node$/,
+      use: "file-loader",
+    });
+    return config;
   },
   images: {
     remotePatterns: [
@@ -20,13 +34,6 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
     ],
-  },
-  webpack: (config) => {
-    config.module.rules.push({
-      test: /\.node$/,
-      use: "file-loader",
-    });
-    return config;
   },
   async headers() {
     return [
