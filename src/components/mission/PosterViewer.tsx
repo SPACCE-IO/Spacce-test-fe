@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import React from "react";
 
 interface Position {
-  x: number;
-  y: number;
+  x: number; // percentage of image width
+  y: number; // percentage of image height
 }
 
 interface Style {
@@ -23,8 +23,8 @@ interface Style {
 }
 
 interface InputDimensions {
-  width: number;
-  height: number;
+  width: number; // percentage of image width
+  height: number; // percentage of image height
 }
 
 interface Question {
@@ -61,10 +61,15 @@ const ImageQuestionViewer = ({
   onAnswerChange,
 }: ImageQuestionViewerProps) => {
   const [scale, setScale] = useState(1);
+  const [containerWidth, setContainerWidth] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [imageDimensions, setImageDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
 
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -74,11 +79,30 @@ const ImageQuestionViewer = ({
     console.log("Image loading state:", { isLoading, imageLoaded, error });
   }, [imageUrl, isLoading, imageLoaded, error]);
 
+  // Update container width and calculate scale
+  useEffect(() => {
+    const updateContainerWidth = () => {
+      if (containerRef.current && imageDimensions.width > 0) {
+        const containerW = containerRef.current.offsetWidth;
+        setContainerWidth(containerW);
+        // Calculate scale based on container width vs natural image width
+        const calculatedScale = containerW / imageDimensions.width;
+        setScale(calculatedScale);
+      }
+    };
+
+    updateContainerWidth();
+    window.addEventListener("resize", updateContainerWidth);
+
+    return () => window.removeEventListener("resize", updateContainerWidth);
+  }, [imageDimensions]);
+
   // Reset loading state when imageUrl changes
   useEffect(() => {
     setIsLoading(true);
     setImageLoaded(false);
     setError(null);
+    setImageDimensions({ width: 0, height: 0 });
   }, [imageUrl]);
 
   // Preload image to handle loading issues
@@ -89,6 +113,10 @@ const ImageQuestionViewer = ({
 
     const handleLoad = () => {
       console.log("Preloaded image successfully:", imageUrl);
+      setImageDimensions({
+        width: img.naturalWidth,
+        height: img.naturalHeight,
+      });
       setImageLoaded(true);
       setIsLoading(false);
     };
@@ -141,14 +169,19 @@ const ImageQuestionViewer = ({
 
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     console.log("Image loaded successfully:", imageUrl);
-    console.log(
-      "Image dimensions:",
-      e.currentTarget.naturalWidth,
-      "x",
-      e.currentTarget.naturalHeight
-    );
+    const img = e.currentTarget;
+    console.log("Image dimensions:", img.naturalWidth, "x", img.naturalHeight);
+    setImageDimensions({ width: img.naturalWidth, height: img.naturalHeight });
     setImageLoaded(true);
     setIsLoading(false);
+
+    // Calculate initial scale based on container width
+    if (containerRef.current) {
+      const containerW = containerRef.current.offsetWidth;
+      setContainerWidth(containerW);
+      const calculatedScale = containerW / img.naturalWidth;
+      setScale(calculatedScale);
+    }
   };
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -156,18 +189,6 @@ const ImageQuestionViewer = ({
     console.error("Failed to load image URL:", imageUrl);
     setError(`Failed to load image: ${imageUrl}`);
     setIsLoading(false);
-  };
-
-  const zoomIn = () => {
-    setScale((prev) => Math.min(prev + 0.2, 3));
-  };
-
-  const zoomOut = () => {
-    setScale((prev) => Math.max(prev - 0.2, 0.5));
-  };
-
-  const resetZoom = () => {
-    setScale(1);
   };
 
   const handleAnswerChange = (questionId: number, value: string) => {
@@ -183,11 +204,23 @@ const ImageQuestionViewer = ({
       question;
     const currentAnswer = answers[question.id] || "";
 
-    // Calculate position based on image scale
-    const left = position.x * scale;
-    const top = position.y * scale;
-    const width = inputDimensions.width * scale;
-    const height = inputDimensions.height * scale;
+    if (
+      !imageRef.current ||
+      imageDimensions.width === 0 ||
+      imageDimensions.height === 0
+    ) {
+      return null;
+    }
+
+    // Get the actual displayed image dimensions (after scaling)
+    const displayedImageWidth = imageDimensions.width * scale;
+    const displayedImageHeight = imageDimensions.height * scale;
+
+    // Calculate position based on percentages
+    const left = (position.x / 100) * displayedImageWidth;
+    const top = (position.y / 100) * displayedImageHeight;
+    const width = (inputDimensions.width / 100) * displayedImageWidth;
+    const height = (inputDimensions.height / 100) * displayedImageHeight;
 
     const inputStyle = {
       position: "absolute" as const,
@@ -204,13 +237,14 @@ const ImageQuestionViewer = ({
       borderWidth: `${style.borderWidth}px`,
       borderStyle: "solid",
       borderRadius: `${style.borderRadius}px`,
-      padding: `${style.padding}px`,
-      margin: `${style.margin}px`,
+      padding: `${style.padding * scale}px`,
+      margin: `${style.margin * scale}px`,
       textAlign: style.textAlign as "left" | "center" | "right",
       resize: "none" as const,
       outline: "none",
       transition: "all 0.2s ease",
       zIndex: 10,
+      boxSizing: "border-box" as const,
     };
 
     // Render different input types based on typeCode
@@ -304,24 +338,21 @@ const ImageQuestionViewer = ({
 
   return (
     <div className="h-full w-full flex flex-col bg-white border">
-  
       {/* Image Container with Questions */}
       <div
         ref={containerRef}
         className="flex-1 overflow-auto relative"
         style={{ minHeight: "400px" }}
       >
-        <div className="relative inline-block shadow-lg w-full overflow-hidden">
+        <div className="relative shadow-lg overflow-hidden w-full">
           <img
             ref={imageRef}
             src={imageUrl}
             alt="Question Form"
             style={{
-              transform: `scale(${scale})`,
-              transformOrigin: "top left",
               display: "block",
-              maxWidth: "none",
-              width:'100%'
+              width: "100%",
+              height: "auto",
             }}
             onLoad={handleImageLoad}
             onError={handleImageError}
@@ -333,7 +364,6 @@ const ImageQuestionViewer = ({
             questions.map((question) => renderInputField(question))}
         </div>
       </div>
-
     </div>
   );
 };

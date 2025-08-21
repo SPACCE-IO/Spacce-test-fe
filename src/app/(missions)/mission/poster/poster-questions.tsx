@@ -374,7 +374,7 @@ const PosterQuestions = ({
 
       placeholder: "e.g., AWS, Azure, Google Cloud",
 
-      position: { x: 1, y: 2 },
+      position: { x: 5, y: 5 },
       style: {
         color: "#000",
         fontSize: 10,
@@ -426,7 +426,7 @@ const PosterQuestions = ({
       placeholder:
         "Share your detailed thoughts and experiences with cloud migration...",
 
-      position: { x: 1, y: 2 },
+      position: { x: 10, y: 10 },
       style: {
         color: "#000",
         fontSize: 10,
@@ -475,21 +475,21 @@ const PosterQuestions = ({
       points: 0,
 
       placeholder: "",
-      position: { x: 10, y: 20 },
+      position: { x: 15, y: 15 },
       style: {
-        color: "#000",
-        fontSize: 10,
-        fontWeight: 500,
+        color: "#fff",
+        fontSize: 50,
+        fontWeight: 100,
         fontFamily: "inter",
-        backgroundColor: "#fff",
-        borderColor: "#000",
-        borderWidth: 1,
+        backgroundColor: "inherit",
+        borderColor: "",
+        borderWidth: 0,
         borderRadius: 0,
         padding: 0,
         margin: 0,
         textAlign: "left",
       },
-      inputDimensions: { width: 10, height: 10 },
+      inputDimensions: { width: 40, height: 4 },
       characterLimit: 100,
 
       lastUpdate: 1755114303900,
