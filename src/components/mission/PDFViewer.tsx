@@ -33,7 +33,10 @@ const PdfViewer = ({ url, toggleDrawer }: PdfViewerProps) => {
   // Determine if URL is absolute or relative
   const pdfUrl = url.startsWith("http")
     ? url
-    : `${process.env.NEXT_PUBLIC_BASE_URL || ""}${url}`;
+    : `${
+        process.env.NEXT_PUBLIC_BASE_URL ||
+        "https://spacce-gateway-service-726569672166.europe-west1.run.app"
+      }${url}`;
 
   useEffect(() => {
     setIsClient(true);
