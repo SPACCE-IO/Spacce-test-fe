@@ -121,7 +121,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             name: `${profileData.firstName} ${profileData.lastName}`,
             firstName: profileData.firstName,
             lastName: profileData.lastName,
-            orgCode: credentials.orgCode as string, // Ensure orgCode is typed as string
+            orgCode: credentials.orgCode as string,
             token: loginData.token,
             profilePic: profileData.profilePic,
             gender: profileData.gender,
@@ -152,6 +152,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
+
+  // CRITICAL: Add trustHost for Cloud Run
+  trustHost: true,
+
   callbacks: {
     async jwt({ token, user }) {
       // Persist user data and token in JWT
@@ -169,12 +173,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   pages: {
-    signIn: "/login", // Use the home page as login page
-    error: "/login", // Redirect to home page on error
+    signIn: "/login",
+    error: "/login",
   },
   session: {
     strategy: "jwt",
-    maxAge: 60 * 50, // 1 hour
+    maxAge: 60 * 50, // 50 minutes
   },
-  secret: process.env.NEXTAUTH_SECRET || "your-secret-key-here",
+  // Remove the secret property - NextAuth v5 reads from AUTH_SECRET env var automatically
 });

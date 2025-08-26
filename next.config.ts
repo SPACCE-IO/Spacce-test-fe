@@ -1,20 +1,25 @@
-import { withNextVideo } from "next-video/process";
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // Enable standalone output for Docker
   output: "standalone",
+
   typescript: {
     ignoreBuildErrors: true,
   },
+
   // Environment variables that should be available at runtime
   env: {
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+    // Updated for NextAuth v5
+    AUTH_URL: process.env.AUTH_URL,
+    AUTH_SECRET: process.env.AUTH_SECRET,
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
   },
+
   eslint: {
     ignoreDuringBuilds: true,
   },
+
+  // Configure image optimization
   images: {
     remotePatterns: [
       {
@@ -24,6 +29,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+
   webpack: (config) => {
     config.module.rules.push({
       test: /\.node$/,
@@ -31,6 +37,7 @@ const nextConfig: NextConfig = {
     });
     return config;
   },
+
   async headers() {
     return [
       {
@@ -42,7 +49,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Cross-Origin-Embedder-Policy",
-            value: "unsafe-none", // 🔧 RELAXED to avoid blocking
+            value: "unsafe-none",
           },
         ],
       },
@@ -50,4 +57,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextVideo(nextConfig);
+module.exports = nextConfig;
