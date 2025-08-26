@@ -26,9 +26,7 @@ interface QueryResult {
 
 // Base query setup
 const baseQuery = fetchBaseQuery({
-  baseUrl:
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    "https://spacce-gateway-service-726569672166.europe-west1.run.app",
+  baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
   prepareHeaders: (headers) => {
     return headers;
   },
@@ -42,7 +40,8 @@ const baseQueryWithStandardizedErrors = async (
   const result = (await baseQuery(args, api, extraOptions)) as QueryResult;
 
   if (result.error) {
-    if (result.error.status === 401) {
+  
+    if(result.error.status === 401){
       signOut({ redirect: true, redirectTo: "/login" });
     }
     return {
@@ -58,6 +57,7 @@ const baseQueryWithStandardizedErrors = async (
 
   const data = result.data as ApiResponse;
   if (data?.error || (data?.statusCode && data?.statusCode >= 400)) {
+     
     return {
       error: {
         status: data?.statusCode || 400,
