@@ -1,11 +1,14 @@
 // @ts-nocheck
 import { apiSlice } from "../slices/apiSlice";
+// const devBaseUrl = 'http://localhost:3005'
+const devBaseUrl =
+  "https://spacce-user-management-726569672166.europe-west1.run.app";
 
 export const userManagementApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     resetPassword: builder.mutation({
       query: ({ data, authToken }) => ({
-        url: `/user/api/v1/profile/password`,
+        url: `${devBaseUrl}/user/api/v1/profile/password`,
         method: "PATCH",
         body: data,
         headers: { Authorization: authToken },
@@ -13,7 +16,7 @@ export const userManagementApi = apiSlice.injectEndpoints({
     }),
     setNewPassword: builder.mutation({
       query: ({ body, authToken }) => ({
-        url: `/user/api/v1/profile/password`,
+        url: `${devBaseUrl}/user/api/v1/profile/password`,
         method: "PATCH",
         body,
         headers: { Authorization: authToken },
@@ -21,7 +24,7 @@ export const userManagementApi = apiSlice.injectEndpoints({
     }),
     getProfile: builder.query({
       query: (authToken) => ({
-        url: `/user/api/v1/profile`,
+        url: `${devBaseUrl}/user/api/v1/profile`,
         method: "GET",
         headers: {
           Authorization: authToken,
@@ -30,7 +33,7 @@ export const userManagementApi = apiSlice.injectEndpoints({
     }),
     updateProfile: builder.mutation({
       query: ({ body, authToken }) => ({
-        url: `/user/api/v1/profile`,
+        url: `${devBaseUrl}/user/api/v1/profile`,
         method: "PUT",
         body,
         headers: {
@@ -41,7 +44,7 @@ export const userManagementApi = apiSlice.injectEndpoints({
     }),
     getDashboard: builder.query({
       query: (authToken) => ({
-        url: `/user/api/v1/dashboard`,
+        url: `${devBaseUrl}/user/api/v1/dashboard`,
         method: "GET",
         headers: {
           Authorization: authToken,
@@ -50,14 +53,14 @@ export const userManagementApi = apiSlice.injectEndpoints({
     }),
     getPage: builder.query({
       query: ({ userName, authToken }) => ({
-        url: `/employee/user/${userName}`,
+        url: `${devBaseUrl}/employee/user/${userName}`,
         method: "GET",
         headers: { Authorization: authToken },
       }),
     }),
     getBackPack: builder.query({
       query: (authToken) => ({
-        url: `/user/api/v1/backpack`,
+        url: `${devBaseUrl}/user/api/v1/backpack`,
         method: "GET",
         headers: { Authorization: authToken },
       }),

@@ -1,11 +1,13 @@
 // @ts-nocheck
 import { apiSlice } from "../slices/apiSlice";
-
+// const devBaseUrl = 'http://localhost:3001'
+const devBaseUrl =
+  "https://spacce-association-management-726569672166.europe-west1.run.app";
 export const associationApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getGroupById: builder.query({
       query: ({ authToken, id }) => ({
-        url: `/association/api/v1/group/${id}`,
+        url: `${devBaseUrl}/association/api/v1/group/${id}`,
         method: "GET",
         headers: { Authorization: authToken },
       }),

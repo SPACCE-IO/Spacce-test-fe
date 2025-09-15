@@ -26,7 +26,7 @@ interface QueryResult {
 
 // Base query setup
 const baseQuery = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
+  baseUrl: '',
   prepareHeaders: (headers) => {
     return headers;
   },
