@@ -34,7 +34,7 @@ declare module "next-auth" {
   }
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+const API_BASE_URL = "https://node-auth-ms-726569672166.europe-west1.run.app";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
