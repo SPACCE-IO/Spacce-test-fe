@@ -35,6 +35,8 @@ declare module "next-auth" {
 }
 
 const API_BASE_URL = "https://node-auth-ms-726569672166.europe-west1.run.app";
+const USER_API_BASE_URL =
+  "https://spacce-user-management-726569672166.europe-west1.run.app";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -90,7 +92,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
           // Fetch user profile using the token
           const profileResponse = await fetch(
-            `${API_BASE_URL}/user/api/v1/profile`,
+            `${USER_API_BASE_URL}/user/api/v1/profile`,
             {
               headers: {
                 Authorization: `Bearer ${loginData.token}`,
