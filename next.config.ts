@@ -9,9 +9,10 @@ const nextConfig = {
 
   // Environment variables that should be available at runtime
   env: {
-    // Updated for NextAuth v5
+    // NextAuth v5 - Frontend URL (where your Next.js app is hosted)
     AUTH_URL: process.env.AUTH_URL,
     AUTH_SECRET: process.env.AUTH_SECRET,
+    // Backend API URL (where your authentication API is hosted)
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
   },
 
