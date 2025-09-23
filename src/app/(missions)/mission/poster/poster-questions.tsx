@@ -96,6 +96,8 @@ const PosterQuestions = ({
   isMissionComplete,
   missionFile,
 }: PdfQuestionsProps) => {
+  console.log('missionFile:', missionFile);
+  console.log('questions:', questions);
   const router = useRouter();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});
@@ -346,158 +348,6 @@ const PosterQuestions = ({
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
-  const one = [
-    {
-      id: 1,
-
-      questionTypeId: 1,
-
-      typeCode: "S",
-
-      description: "Short answer question for basic information",
-
-      hint: "Enter a single word or short phrase",
-
-      question: "What is your favorite cloud service provider?",
-
-      sequence: 1,
-
-      hasCorrectAnswer: false,
-
-      isRequired: true,
-
-      points: 0,
-
-      placeholder: "e.g., AWS, Azure, Google Cloud",
-
-      position: { x: 5, y: 5 },
-      style: {
-        color: "#000",
-        fontSize: 10,
-        fontWeight: 500,
-        fontFamily: "inter",
-        backgroundColor: "#fff",
-        borderColor: "#000",
-        borderWidth: 1,
-        borderRadius: 0,
-        padding: 0,
-        margin: 0,
-        textAlign: "left",
-      },
-      inputDimensions: { width: 10, height: 10 },
-      characterLimit: 100,
-
-      lastUpdate: 1754638794883,
-
-      userAnswer:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-
-      status: 1,
-
-      correctAnswer: null,
-    },
-
-    {
-      id: 2,
-
-      questionTypeId: 2,
-
-      typeCode: "L",
-
-      description: "Long answer question for detailed feedback",
-
-      hint: "Please provide detailed information about challenges, benefits, and lessons learned",
-
-      question:
-        "Describe your experience with cloud migration in your organization.",
-
-      sequence: 5,
-
-      hasCorrectAnswer: false,
-
-      isRequired: true,
-
-      points: 0,
-
-      placeholder:
-        "Share your detailed thoughts and experiences with cloud migration...",
-
-      position: { x: 10, y: 10 },
-      style: {
-        color: "#000",
-        fontSize: 10,
-        fontWeight: 500,
-        fontFamily: "inter",
-        backgroundColor: "#fff",
-        borderColor: "#000",
-        borderWidth: 1,
-        borderRadius: 0,
-        padding: 0,
-        margin: 0,
-        textAlign: "left",
-      },
-      inputDimensions: { width: 10, height: 10 },
-      characterLimit: 100,
-
-      lastUpdate: 1754638979862,
-
-      userAnswer:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-
-      status: 1,
-
-      correctAnswer: null,
-    },
-
-    {
-      id: 3,
-
-      questionTypeId: 7,
-
-      typeCode: "U",
-
-      description: "User search for team member selection",
-
-      hint: "Search and select the correct team member",
-
-      question: "Who is the lead cloud architect in your team?",
-
-      sequence: 8,
-
-      hasCorrectAnswer: true,
-
-      isRequired: true,
-
-      points: 0,
-
-      placeholder: "",
-      position: { x: 15, y: 15 },
-      style: {
-        color: "#fff",
-        fontSize: 50,
-        fontWeight: 100,
-        fontFamily: "inter",
-        backgroundColor: "inherit",
-        borderColor: "",
-        borderWidth: 0,
-        borderRadius: 0,
-        padding: 0,
-        margin: 0,
-        textAlign: "left",
-      },
-      inputDimensions: { width: 40, height: 4 },
-      characterLimit: 100,
-
-      lastUpdate: 1755114303900,
-
-      userAnswer:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-
-      status: 1,
-
-      correctAnswer: null,
-    },
-  ];
 
   // Render content based on mission type
   const renderContent = () => {
@@ -517,12 +367,7 @@ const PosterQuestions = ({
     } else if (missionType === "POSTER_MISSION") {
       return (
         <div className="w-full h-full min-h-[600px]">
-          <PosterViewer
-            imageUrl={
-              "https://spacce-dev-store.s3.eu-west-1.amazonaws.com/mystory.jpg"
-            }
-            questions={one}
-          />
+          <PosterViewer imageUrl={missionFile} questions={questions} />
         </div>
       );
     } else {

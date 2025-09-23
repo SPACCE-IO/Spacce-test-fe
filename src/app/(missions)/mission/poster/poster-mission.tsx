@@ -225,6 +225,12 @@ const PosterMission = ({ mission }: PosterMissionComponentProps) => {
     );
   }
 
+  function getDocumentUrl(documentName) {
+    const doc = mission?.documents.find((d) => d.name === documentName);
+    return doc ? doc.url.url : null; // returns null if document not found
+  }
+const missionPosterUrl = getDocumentUrl("MISSION_POSTER");
+
   return (
     <div className="h-screen  overflow-hidden">
       <AnimatedMissionBadge
@@ -307,7 +313,7 @@ const PosterMission = ({ mission }: PosterMissionComponentProps) => {
           <PosterQuestions
             questions={mission.questions}
             missionType={mission.type}
-            missionFile={"/dummy.pdf"}
+            missionFile={missionPosterUrl}
             missionId={mission.id}
             isMissionComplete={isMissionComplete}
           />
