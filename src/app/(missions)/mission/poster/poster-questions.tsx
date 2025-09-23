@@ -354,7 +354,7 @@ const PosterQuestions = ({
     if (missionType === "PDF_MISSION") {
       return (
         <div className="w-full h-full min-h-[600px]">
-          <PdfViewer url={missionFile || ""} />
+          <PdfViewer url={missionFile || ""} toggleDrawer={toggleDrawer} />
         </div>
       );
     } else if (missionType === "VIDEO_MISSION") {
@@ -367,7 +367,12 @@ const PosterQuestions = ({
     } else if (missionType === "POSTER_MISSION") {
       return (
         <div className="w-full h-full min-h-[600px]">
-          <PosterViewer imageUrl={missionFile} questions={questions} />
+          <PosterViewer 
+            imageUrl={missionFile || ""} 
+            questions={questions} 
+            answers={answers}
+            onAnswerChange={handleAnswerChange}
+          />
         </div>
       );
     } else {

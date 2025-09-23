@@ -37,31 +37,57 @@ interface Question {
   sequence: number;
   hasCorrectAnswer: boolean;
   isRequired: boolean;
+  style: Style;
   points: number;
   placeholder: string;
   position: Position;
-  style: Style;
-  inputDimensions: InputDimensions;
-  characterLimit: number;
-  lastUpdate: number;
   userAnswer: string;
-  status: number;
+  status: number; // 0 = not attempted/incorrect, 1 = correct
   correctAnswer: string | null;
+  characterLimit?: number;
+  inputDimensions: InputDimensions;
+  options?: Array<{
+    id: string;
+    text: string;
+    isCorrect: boolean;
+  }>;
+  imageOptions?: Array<{
+    id: string;
+    altText: string;
+    caption: string;
+    imageUrl: string;
+    isCorrect: boolean;
+  }>;
+  maxRating?: number;
+  allowMultipleSelection?: boolean;
+  matchingtems?: Array<{
+    id: string;
+    altText: string;
+    caption: string;
+    imageUrl: string;
+  }>;
 }
 
 interface ImageQuestionViewerProps {
   imageUrl: string;
   questions: Question[];
+  answers?: Record<number, string>;
   onAnswerChange?: (questionId: number, answer: string) => void;
 }
 
 const ImageQuestionViewer = ({
   imageUrl,
   questions,
+  answers: externalAnswers,
   onAnswerChange,
 }: ImageQuestionViewerProps) => {
   const [scale, setScale] = useState(1);
   const [containerWidth, setContainerWidth] = useState(0);
+  const [containerHeight, setContainerHeight] = useState(0);
+  const [displayedImageDimensions, setDisplayedImageDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -79,22 +105,36 @@ const ImageQuestionViewer = ({
     console.log("Image loading state:", { isLoading, imageLoaded, error });
   }, [imageUrl, isLoading, imageLoaded, error]);
 
-  // Update container width and calculate scale
+  // Update container dimensions and calculate scale
   useEffect(() => {
-    const updateContainerWidth = () => {
-      if (containerRef.current && imageDimensions.width > 0) {
+    const updateContainerDimensions = () => {
+      if (containerRef.current && imageDimensions.width > 0 && imageDimensions.height > 0) {
         const containerW = containerRef.current.offsetWidth;
+        const containerH = containerRef.current.offsetHeight;
         setContainerWidth(containerW);
-        // Calculate scale based on container width vs natural image width
-        const calculatedScale = containerW / imageDimensions.width;
+        setContainerHeight(containerH);
+        
+        // Calculate scale to fit both width and height
+        const scaleX = containerW / imageDimensions.width;
+        const scaleY = containerH / imageDimensions.height;
+        // Use the smaller scale to ensure the image fits completely
+        const calculatedScale = Math.min(scaleX, scaleY);
         setScale(calculatedScale);
+        
+        // Calculate the actual displayed image dimensions
+        const displayedWidth = imageDimensions.width * calculatedScale;
+        const displayedHeight = imageDimensions.height * calculatedScale;
+        setDisplayedImageDimensions({
+          width: displayedWidth,
+          height: displayedHeight,
+        });
       }
     };
 
-    updateContainerWidth();
-    window.addEventListener("resize", updateContainerWidth);
+    updateContainerDimensions();
+    window.addEventListener("resize", updateContainerDimensions);
 
-    return () => window.removeEventListener("resize", updateContainerWidth);
+    return () => window.removeEventListener("resize", updateContainerDimensions);
   }, [imageDimensions]);
 
   // Reset loading state when imageUrl changes
@@ -153,19 +193,25 @@ const ImageQuestionViewer = ({
     };
   }, [imageUrl]);
 
-  // Initialize answers from questions
+  // Initialize answers from questions or external answers
   useEffect(() => {
-    const initialAnswers: Record<number, string> = {};
-    questions.forEach((q) => {
-      try {
-        const parsedAnswer = q.userAnswer ? JSON.parse(q.userAnswer) : "";
-        initialAnswers[q.id] = parsedAnswer || "";
-      } catch {
-        initialAnswers[q.id] = q.userAnswer || "";
-      }
-    });
-    setAnswers(initialAnswers);
-  }, [questions]);
+    if (externalAnswers) {
+      // Use external answers if provided
+      setAnswers(externalAnswers);
+    } else {
+      // Fallback to initializing from questions
+      const initialAnswers: Record<number, string> = {};
+      questions.forEach((q) => {
+        try {
+          const parsedAnswer = q.userAnswer ? JSON.parse(q.userAnswer) : "";
+          initialAnswers[q.id] = parsedAnswer || "";
+        } catch {
+          initialAnswers[q.id] = q.userAnswer || "";
+        }
+      });
+      setAnswers(initialAnswers);
+    }
+  }, [questions, externalAnswers]);
 
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     console.log("Image loaded successfully:", imageUrl);
@@ -175,12 +221,27 @@ const ImageQuestionViewer = ({
     setImageLoaded(true);
     setIsLoading(false);
 
-    // Calculate initial scale based on container width
+    // Calculate initial scale based on container dimensions
     if (containerRef.current) {
       const containerW = containerRef.current.offsetWidth;
+      const containerH = containerRef.current.offsetHeight;
       setContainerWidth(containerW);
-      const calculatedScale = containerW / img.naturalWidth;
+      setContainerHeight(containerH);
+      
+      // Calculate scale to fit both width and height
+      const scaleX = containerW / img.naturalWidth;
+      const scaleY = containerH / img.naturalHeight;
+      // Use the smaller scale to ensure the image fits completely
+      const calculatedScale = Math.min(scaleX, scaleY);
       setScale(calculatedScale);
+      
+      // Calculate the actual displayed image dimensions
+      const displayedWidth = img.naturalWidth * calculatedScale;
+      const displayedHeight = img.naturalHeight * calculatedScale;
+      setDisplayedImageDimensions({
+        width: displayedWidth,
+        height: displayedHeight,
+      });
     }
   };
 
@@ -196,6 +257,7 @@ const ImageQuestionViewer = ({
       ...prev,
       [questionId]: value,
     }));
+    // Call external onAnswerChange to sync with parent component
     onAnswerChange?.(questionId, value);
   };
 
@@ -206,21 +268,18 @@ const ImageQuestionViewer = ({
 
     if (
       !imageRef.current ||
-      imageDimensions.width === 0 ||
-      imageDimensions.height === 0
+      displayedImageDimensions.width === 0 ||
+      displayedImageDimensions.height === 0
     ) {
       return null;
     }
 
-    // Get the actual displayed image dimensions (after scaling)
-    const displayedImageWidth = imageDimensions.width * scale;
-    const displayedImageHeight = imageDimensions.height * scale;
-
-    // Calculate position based on percentages
-    const left = (position.x / 100) * displayedImageWidth;
-    const top = (position.y / 100) * displayedImageHeight;
-    const width = (inputDimensions.width / 100) * displayedImageWidth;
-    const height = (inputDimensions.height / 100) * displayedImageHeight;
+    // Calculate position and dimensions based on actual displayed image dimensions
+    // position.x, position.y, inputDimensions.width, inputDimensions.height are percentages of original image
+    const left = (position.x / 100) * displayedImageDimensions.width;
+    const top = (position.y / 100) * displayedImageDimensions.height;
+    const width = (inputDimensions.width / 100) * displayedImageDimensions.width;
+    const height = (inputDimensions.height / 100) * displayedImageDimensions.height;
 
     const inputStyle = {
       position: "absolute" as const,
@@ -259,7 +318,7 @@ const ImageQuestionViewer = ({
             title={hint}
             value={currentAnswer}
             onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-            maxLength={question.characterLimit}
+            maxLength={question.characterLimit || undefined}
             required={question.isRequired}
             className="focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
@@ -274,7 +333,7 @@ const ImageQuestionViewer = ({
             title={hint}
             value={currentAnswer}
             onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-            maxLength={question.characterLimit}
+            maxLength={question.characterLimit || undefined}
             required={question.isRequired}
             className="focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
@@ -290,7 +349,7 @@ const ImageQuestionViewer = ({
             title={hint}
             value={currentAnswer}
             onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-            maxLength={question.characterLimit}
+            maxLength={question.characterLimit || undefined}
             required={question.isRequired}
             className="focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
@@ -306,7 +365,7 @@ const ImageQuestionViewer = ({
             title={hint}
             value={currentAnswer}
             onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-            maxLength={question.characterLimit}
+            maxLength={question.characterLimit || undefined}
             required={question.isRequired}
             className="focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
@@ -341,10 +400,10 @@ const ImageQuestionViewer = ({
       {/* Image Container with Questions */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-auto relative"
+        className="flex-1 relative flex items-center justify-center"
         style={{ minHeight: "400px" }}
       >
-        <div className="relative shadow-lg overflow-hidden w-full">
+        <div className="relative shadow-lg overflow-hidden w-full h-full">
           <img
             ref={imageRef}
             src={imageUrl}
@@ -352,7 +411,8 @@ const ImageQuestionViewer = ({
             style={{
               display: "block",
               width: "100%",
-              height: "auto",
+              height: "100%",
+              objectFit: "contain",
             }}
             onLoad={handleImageLoad}
             onError={handleImageError}
