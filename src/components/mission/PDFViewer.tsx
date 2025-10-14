@@ -30,8 +30,16 @@ const PdfViewer = ({ url, toggleDrawer }: PdfViewerProps) => {
   const renderTaskRef = useRef<any>(null); // Store current render task
   const renderTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Determine if URL is absolute or relative
-  const pdfUrl = url;
+  // Create proxy URL for Google Cloud Storage to avoid CORS issues
+  const getPdfUrl = (originalUrl: string) => {
+    // If it's a Google Cloud Storage URL, use our proxy to avoid CORS
+    if (originalUrl.includes('storage.googleapis.com')) {
+      return `/api/pdf-proxy?url=${encodeURIComponent(originalUrl)}`;
+    }
+    return originalUrl;
+  };
+
+  const pdfUrl = getPdfUrl(url);
 
   useEffect(() => {
     setIsClient(true);
@@ -78,9 +86,23 @@ const PdfViewer = ({ url, toggleDrawer }: PdfViewerProps) => {
         } else {
           throw new Error("PDF.js failed to load");
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error loading PDF:", err);
-        setError("Failed to load PDF document");
+        
+        // Provide more specific error messages
+        let errorMessage = "Failed to load PDF document";
+        
+        if (err?.name === 'UnknownErrorException' && err?.message?.includes('Failed to fetch')) {
+          errorMessage = "Network error: Unable to fetch PDF. This might be due to CORS restrictions or network connectivity issues.";
+        } else if (err?.message?.includes('CORS')) {
+          errorMessage = "CORS error: The PDF server doesn't allow requests from this domain.";
+        } else if (err?.message?.includes('404')) {
+          errorMessage = "PDF not found: The document may have been moved or deleted.";
+        } else if (err?.message?.includes('403')) {
+          errorMessage = "Access denied: You don't have permission to view this PDF.";
+        }
+        
+        setError(errorMessage);
         setIsLoading(false);
       }
     };
@@ -138,7 +160,7 @@ const PdfViewer = ({ url, toggleDrawer }: PdfViewerProps) => {
 
       // Clear the reference after successful render
       renderTaskRef.current = null;
-    } catch (err) {
+    } catch (err: any) {
       // Don't log cancelled render operations as errors
       if (err?.name !== "RenderingCancelledException") {
         console.error("Error rendering page:", err);
