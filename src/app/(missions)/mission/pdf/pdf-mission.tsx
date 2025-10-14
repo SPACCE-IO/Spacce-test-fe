@@ -105,7 +105,7 @@ const PdfMission = ({ mission }: StandardMissionComponentProps) => {
   const section5Ref = useRef<HTMLDivElement>(null!);
   const router = useRouter();
   const { data: session } = useSession();
-
+  console.log("mission", mission);
 
   const [logResponse, logResponseProps] = useLogResponseMutation();
 
@@ -199,6 +199,11 @@ const PdfMission = ({ mission }: StandardMissionComponentProps) => {
     );
   }
 
+  function getFileUrlByName(name: string, files: any[]) {
+    const file = files.find((item) => item.name === name);
+    return file ? file.url.url : null;
+  }
+
   return (
     <div className="h-screen  overflow-hidden">
       <AnimatedMissionBadge
@@ -281,7 +286,7 @@ const PdfMission = ({ mission }: StandardMissionComponentProps) => {
           <PdfQuestions
             questions={mission.questions}
             missionType={mission.type}
-            missionFile={"/dummy.pdf"}
+            missionFile={getFileUrlByName("MISSION_PDF", mission.documents)}
             missionId={mission.id}
             isMissionComplete={isMissionComplete}
           />

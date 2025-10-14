@@ -31,23 +31,22 @@ const PdfViewer = ({ url, toggleDrawer }: PdfViewerProps) => {
   const renderTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Determine if URL is absolute or relative
-  const pdfUrl = url.startsWith("http")
-    ? url
-    : `${process.env.NEXT_PUBLIC_BASE_URL || ""}${url}`;
+  const pdfUrl = url;
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  const handleToogle =()=>{
-    toggleDrawer()
-  }
+  const handleToogle = () => {
+    toggleDrawer();
+  };
 
   // Load PDF.js
   useEffect(() => {
     if (!isClient) return;
 
     const loadPdfJs = async () => {
+      console.log("Loading PDF.js for URL 2:", pdfUrl);
       try {
         // Load PDF.js using script tags for better compatibility
         if (typeof window !== "undefined" && !window.pdfjsLib) {

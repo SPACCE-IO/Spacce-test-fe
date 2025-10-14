@@ -354,7 +354,10 @@ const PdfQuestions = ({
     if (missionType === "PDF_MISSION") {
       return (
         <div className="w-full h-full min-h-[600px]">
-          <PdfViewer toggleDrawer={()=> setIsDrawerOpen(!isDrawerOpen)} url={'https://spacce-dev-store.s3.eu-west-1.amazonaws.com/file-sample_150kB.pdf'} />
+          <PdfViewer
+            toggleDrawer={() => setIsDrawerOpen(!isDrawerOpen)}
+            url={missionFile || ""}
+          />
         </div>
       );
     } else if (missionType === "VIDEO_MISSION") {

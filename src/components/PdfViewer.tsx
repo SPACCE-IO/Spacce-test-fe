@@ -42,6 +42,7 @@ const PdfViewer = ({ url, toggleDrawer }: PdfViewerProps) => {
     if (!isClient) return;
 
     const loadPdfJs = async () => {
+      console.log("Loading PDF.js for URL:", pdfUrl);
       try {
         // Load PDF.js using script tags for better compatibility
         if (typeof window !== "undefined" && !window.pdfjsLib) {
