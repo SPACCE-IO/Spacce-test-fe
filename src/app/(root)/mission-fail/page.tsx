@@ -8,12 +8,17 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Standard from "@/public/assets/badges/standard.svg";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import useMissionReward from "@/src/hooks/useMissionReward";
 
 const MissionFail = () => {
   const mission = useMission();
   const missionReward = useMissionReward();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleClick = () => {
     router.push("/dashboard?tab=current-mission");
@@ -23,7 +28,9 @@ const MissionFail = () => {
   return (
     <EndSectionGradient>
       <div className=" container mx-auto flex flex-col items-center justify-center gap-10">
-        <MissionBadge missionReward={missionReward} />
+        <MissionBadge 
+          missionReward={mounted ? (missionReward || Standard) : Standard} 
+        />
         <div className="flex flex-col items-center justify-center gap-10">
           <h2 className=" text-white text-[24px] font-semibold py-5">
             Mission Failed
@@ -53,7 +60,7 @@ const MissionBadge = ({ width = 330, height = 330, missionReward }: any) => {
   return (
     <div className="container mx-auto rounded-[5px] flex justify-center items-center">
       <Image
-        src={missionReward}
+        src={missionReward || Standard}
         width={width}
         height={height}
         alt={`Mission Badge`}
