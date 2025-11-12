@@ -34,14 +34,14 @@ const NotFound = () => {
           </p>
 
           <div className="flex gap-4 mt-6">
-            <Button
+            {/* <Button
               onClick={handleGoBack}
               variant="outline"
               className="w-[180px] h-[50px] rounded-md flex items-center justify-center gap-2 border-2 border-gray-300 text-gray-700 hover:bg-gray-100"
             >
               <ArrowLeft className="w-4 h-4" />
               Go Back
-            </Button>
+            </Button> */}
 
             <Button
               onClick={handleGoHome}

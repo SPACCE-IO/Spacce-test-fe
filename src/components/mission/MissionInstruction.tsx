@@ -1,6 +1,7 @@
-import { Mouse } from 'lucide-react';
-import React from 'react'
-import { Button } from '../ui/button';
+import { Mouse, X } from "lucide-react";
+import React from "react";
+import { Button } from "../ui/button";
+import router from "next/router";
 
 interface MissionSearchProps {
   title: string;
@@ -18,7 +19,7 @@ const MissionInstruction = ({
   children,
 }: MissionSearchProps) => {
   return (
-    <section className="relative min-h-screen justify-center -my-6 flex flex-col p-5 mx-auto container ">
+    <section className="relative min-h-screen justify-center -my-6 mt-[85px] flex flex-col p-5 mx-auto container ">
       <div className="w-full p-10">
         {/* Mission Name */}
         <p className="text-gray-600 text-sm mb-2">Why I Woke Up</p>

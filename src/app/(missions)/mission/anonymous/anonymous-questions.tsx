@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/src/components/ui/button";
-import { Mouse } from "lucide-react";
+import { Mouse, X } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { QuestionRenderer } from "@/src/components/questions/QuestionRenderer";
@@ -352,8 +352,20 @@ const AnonymousQuestions = ({
     return isCurrentQuestionCorrect() ? "Next Question" : "Submit & Next";
   };
 
+  const handleClose = () => {
+    router.push("/dashboard?tab=current-mission");
+  };
+
   return (
     <section className="w-full min-h-screen flex flex-col justify-center">
+      <button
+        onClick={handleClose}
+        className={`absolute  
+            text-black top-5 left-5
+         z-10`}
+      >
+        <X size={32} />
+      </button>
       <div className="container mx-auto">
         <p className="text-gray-600 text-sm mb-2">Why I Woke Up</p>
 

@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   currentMission: null,
+  currentMissionReward:null
 };
 
 const missionSlice = createSlice({
@@ -14,11 +15,15 @@ const missionSlice = createSlice({
 
     clearCurrentMission: (state) => {
       state.currentMission = null;
+      state.currentMissionReward = null;
+    },
+    setCurrentMissionReward: (state, action) => {
+      state.currentMissionReward = action.payload;
     },
   },
 });
 
-export const { setCurrentMission, clearCurrentMission } = missionSlice.actions;
+export const { setCurrentMission, clearCurrentMission ,setCurrentMissionReward} = missionSlice.actions;
 
 export const selectCurrentMission = (state: any) =>
   state.mission.currentMission;

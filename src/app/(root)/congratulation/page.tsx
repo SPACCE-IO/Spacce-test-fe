@@ -9,9 +9,11 @@ import Standard from "@/public/assets/badges/standard.svg";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import React from "react";
+import useMissionReward from "@/src/hooks/useMissionReward";
 
 const Congratulations = () => {
   const mission = useMission();
+  const missionReward = useMissionReward();
   const handleClick = () => {
     router.push("/dashboard?tab=current-mission");
   };
@@ -20,7 +22,7 @@ const Congratulations = () => {
   return (
     <EndSectionGradient>
       <div className=" container mx-auto flex flex-col items-center justify-center gap-10">
-        <MissionBadge mission={mission?.name} />
+        <MissionBadge missionReward={missionReward} />
         <div className="flex flex-col items-center justify-center gap-10">
           <h2 className=" text-erify-dark text-[24px] font-semibold py-5">
             Congratulations
@@ -44,14 +46,14 @@ const Congratulations = () => {
 
 export default Congratulations;
 
-const MissionBadge = ({ width = 330, height = 330, mission }: any) => {
+const MissionBadge = ({ width = 330, height = 330, missionReward }: any) => {
   return (
     <div className="container mx-auto rounded-[5px] flex justify-center items-center">
       <Image
-        src={Standard}
+        src={missionReward}
         width={width}
         height={height}
-        alt={`${mission} Mission Badge`}
+        alt={` Mission Badge`}
       />
     </div>
   );

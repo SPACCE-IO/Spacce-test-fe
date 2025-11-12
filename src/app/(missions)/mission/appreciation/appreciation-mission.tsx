@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { Mouse } from "lucide-react";
+import { Mouse, X } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import AnimatedMissionBadge from "@/src/components/AnimatedMissionBadge";
 import StartSection from "@/src/components/start-section";
@@ -9,6 +9,7 @@ import MissionInstruction from "@/src/components/mission/MissionInstruction";
 import TaskPaginationSection from "@/src/components/mission/TaskPaginationSection";
 import AppreciationIntro from "./appreciation-intro";
 import AppreciationQuestions from "./appreciation-questions";
+import router from "next/router";
 
 // Define interfaces based on your API response
 interface MissionDocument {
@@ -125,6 +126,10 @@ const AppreciationMission = ({ mission }: StandardMissionComponentProps) => {
     }
   };
 
+  const handleClose = () => {
+    router.push("/dashboard?tab=current-mission");
+  };
+
   useEffect(() => {
     const options = {
       root: containerRef.current,
@@ -192,7 +197,17 @@ const AppreciationMission = ({ mission }: StandardMissionComponentProps) => {
   }
 
   return (
-    <div className="h-screen  overflow-hidden">
+    <div className="h-screen relative  overflow-hidden">
+      <button
+        onClick={handleClose}
+        className={` fixed  ${
+          activeSection != 1
+            ? "text-white top-5 right-5"
+            : "text-black top-5 left-5"
+        } z-10`}
+      >
+        <X size={32} />
+      </button>
       <AnimatedMissionBadge
         mission={mission.type}
         missionStatus={isMissionComplete ? "complete" : "incomplete"}

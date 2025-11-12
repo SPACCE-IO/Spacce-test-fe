@@ -28,6 +28,11 @@ const nextConfig = {
         hostname: "spacce-dev-store.s3.eu-west-1.amazonaws.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "storage.googleapis.com",
+        pathname: "/**",
+      },
     ],
   },
 

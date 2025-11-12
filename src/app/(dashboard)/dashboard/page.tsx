@@ -16,6 +16,7 @@ import ProtectedRoute from "@/src/components/ProtectedRoute";
 import CurrentMission from "@/src/components/current-mission";
 import Showcase from "@/src/components/showcase";
 import CompanyFeed from "@/src/components/company-feed";
+import { useDispatch } from "react-redux";
 
 const Dashboard = () => {
   const [feedLayout, setFeedLayout] = useState<"grid" | "list">("grid");
@@ -25,6 +26,7 @@ const Dashboard = () => {
   const router = useRouter();
   const { data: session } = useSession();
 
+  console.log("Session Data:", session);
   const handleLogout = () => {
     signOut({ redirect: true, redirectTo: "/login" });
   };
@@ -51,11 +53,13 @@ const Dashboard = () => {
                   onClick={() => router.push("/profile")}
                   className="text-white  justify-end p-2 rounded-3xl bg-white bg-opacity-10 hover:bg-opacity-20 "
                 >
-                  <img
-                    src={session?.user?.profilePic?.url}
-                    alt={`Profile`}
-                    className="w-8 h-8 object-cover rounded-full"
-                  />
+                  {session?.user.profilePic != null && (
+                    <img
+                      src={session?.user?.profilePic?.url}
+                      alt={`Profile`}
+                      className="w-8 h-8 object-cover rounded-full"
+                    />
+                  )}
                   {session?.user.firstName} {session?.user.lastName}
                 </Button>
                 <Button

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { Mouse } from "lucide-react";
+import { Mouse, X } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import AnonymousIntro from "./anonymous-intro";
 import AnonymousQuestions from "./anonymous-questions";
@@ -9,6 +9,7 @@ import AnimatedMissionBadge from "@/src/components/AnimatedMissionBadge";
 import StartSection from "@/src/components/start-section";
 import MissionInstruction from "@/src/components/mission/MissionInstruction";
 import TaskPaginationSection from "@/src/components/mission/TaskPaginationSection";
+import router from "next/router";
 // Define interfaces based on your API response
 interface MissionDocument {
   name: string;
@@ -91,106 +92,119 @@ interface AnonymousMissionComponentProps {
 }
 
 const AnonymousMission = ({ mission }: AnonymousMissionComponentProps) => {
- const [activeSection, setActiveSection] = useState<number>(0);
- const totalSteps = 4;
- const containerRef = useRef<HTMLDivElement>(null!);
- const startSectionRef = useRef<HTMLDivElement>(null!);
- const section2Ref = useRef<HTMLDivElement>(null!);
- const section3Ref = useRef<HTMLDivElement>(null!);
- const section4Ref = useRef<HTMLDivElement>(null!);
- const section5Ref = useRef<HTMLDivElement>(null!);
+  const [activeSection, setActiveSection] = useState<number>(0);
+  const totalSteps = 4;
+  const containerRef = useRef<HTMLDivElement>(null!);
+  const startSectionRef = useRef<HTMLDivElement>(null!);
+  const section2Ref = useRef<HTMLDivElement>(null!);
+  const section3Ref = useRef<HTMLDivElement>(null!);
+  const section4Ref = useRef<HTMLDivElement>(null!);
+  const section5Ref = useRef<HTMLDivElement>(null!);
 
- // Check if mission is complete based on status
- const isMissionComplete = mission?.status === 2 || mission?.status === 1;
+  const handleClose = () => {
+    router.push("/dashboard?tab=current-mission");
+  };
+  // Check if mission is complete based on status
+  const isMissionComplete = mission?.status === 2 || mission?.status === 1;
 
- const scrollToSection = (direction: "up" | "down") => {
-   if (containerRef.current) {
-     const container = containerRef.current;
-     const currentScroll = container.scrollTop;
-     const viewportHeight = container.clientHeight;
+  const scrollToSection = (direction: "up" | "down") => {
+    if (containerRef.current) {
+      const container = containerRef.current;
+      const currentScroll = container.scrollTop;
+      const viewportHeight = container.clientHeight;
 
-     container.scrollTo({
-       top:
-         currentScroll +
-         (direction === "down" ? viewportHeight : -viewportHeight),
-       behavior: "smooth",
-     });
-   }
- };
+      container.scrollTo({
+        top:
+          currentScroll +
+          (direction === "down" ? viewportHeight : -viewportHeight),
+        behavior: "smooth",
+      });
+    }
+  };
 
- const handleButtonScroll = (sectionRef: React.RefObject<HTMLDivElement>) => {
-   if (sectionRef.current) {
-     sectionRef.current.scrollIntoView({ behavior: "smooth" });
-   }
- };
+  const handleButtonScroll = (sectionRef: React.RefObject<HTMLDivElement>) => {
+    if (sectionRef.current) {
+      sectionRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
- useEffect(() => {
-   const options = {
-     root: containerRef.current,
-     rootMargin: "0px",
-     threshold: 0.5,
-   };
+  useEffect(() => {
+    const options = {
+      root: containerRef.current,
+      rootMargin: "0px",
+      threshold: 0.5,
+    };
 
-   const observerCallback = (entries: IntersectionObserverEntry[]) => {
-     entries.forEach((entry) => {
-       if (entry.isIntersecting) {
-         const sectionIndex = Number(
-           entry.target.getAttribute("data-section-index")
-         );
-         setActiveSection(sectionIndex);
-       }
-     });
-   };
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const sectionIndex = Number(
+            entry.target.getAttribute("data-section-index")
+          );
+          setActiveSection(sectionIndex);
+        }
+      });
+    };
 
-   const observer = new IntersectionObserver(observerCallback, options);
+    const observer = new IntersectionObserver(observerCallback, options);
 
-   const sections = [
-     startSectionRef.current,
-     section2Ref.current,
-     section3Ref.current,
-     section4Ref.current,
-     section5Ref.current,
-   ];
+    const sections = [
+      startSectionRef.current,
+      section2Ref.current,
+      section3Ref.current,
+      section4Ref.current,
+      section5Ref.current,
+    ];
 
-   sections.forEach((section, index) => {
-     if (section) {
-       section.setAttribute("data-section-index", index.toString());
-       observer.observe(section);
-     }
-   });
+    sections.forEach((section, index) => {
+      if (section) {
+        section.setAttribute("data-section-index", index.toString());
+        observer.observe(section);
+      }
+    });
 
-   return () => {
-     sections.forEach((section) => {
-       if (section) observer.unobserve(section);
-     });
-   };
- }, []);
+    return () => {
+      sections.forEach((section) => {
+        if (section) observer.unobserve(section);
+      });
+    };
+  }, []);
 
- const getTaskTitle = (sectionIndex: number): string => {
-   switch (sectionIndex) {
-     case 1:
-       return "Introduction";
-     case 2:
-       return "Task 01";
-     case 3:
-       return "Task 02";
-     case 4:
-       return "Congratulations";
-     default:
-       return "";
-   }
- };
+  const getTaskTitle = (sectionIndex: number): string => {
+    switch (sectionIndex) {
+      case 1:
+        return "Introduction";
+      case 2:
+        return "Task 01";
+      case 3:
+        return "Task 02";
+      case 4:
+        return "Congratulations";
+      default:
+        return "";
+    }
+  };
 
- // Show loading if mission data is not available
- if (!mission) {
-   return (
-     <div className="h-screen flex items-center justify-center">
-       <div className="text-white text-xl">Loading mission...</div>
-     </div>
-   );
- }
+  // Show loading if mission data is not available
+  if (!mission) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="text-white text-xl">Loading mission...</div>
+      </div>
+    );
+  }
   return (
-    <div className="h-screen  overflow-hidden">
+    <div className="h-screen relative overflow-hidden">
+      <button
+        onClick={handleClose}
+        className={` fixed  ${
+          activeSection != 1
+            ? "text-white top-5 right-5"
+            : "text-black top-5 left-5"
+        } z-10`}
+      >
+        <X size={32} />
+      </button>
       <AnimatedMissionBadge
         mission={mission.type}
         missionStatus={isMissionComplete ? "complete" : "incomplete"}

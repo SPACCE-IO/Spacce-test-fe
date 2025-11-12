@@ -29,6 +29,8 @@ import AnimatedBadge from "./AnimatedBadge";
 import { getAuthToken } from "@/src/utils/auth";
 import { useSession } from "next-auth/react";
 import { useGetDashboardQuery } from "../services/userManagement";
+import { useDispatch } from "react-redux";
+import { setCurrentMissionReward } from "../slices/missionSlice";
 
 const myFont = localFont({ src: "../fonts/Satoshi-Medium.woff" });
 
@@ -157,11 +159,14 @@ export default function CurrentMission() {
     lastName: "",
   });
 
-  const {data:session} = useSession()
+  const { data: session } = useSession();
+  const dispatch = useDispatch();
 
   const timelineRef = useRef<HTMLDivElement>(null);
   const missionsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const { data, isLoading, isError, isSuccess } = useGetDashboardQuery(session?.accessToken);
+  const { data, isLoading, isError, isSuccess } = useGetDashboardQuery(
+    session?.accessToken
+  );
 
   const router = useRouter();
 
@@ -185,7 +190,7 @@ export default function CurrentMission() {
       });
 
       // Convert API missions to our mission format
-      const convertedMissions: Mission[] = [...dashboardData.missions] // Create a copy first
+      const convertedMissions: Mission[] = [...dashboardData?.missions] // Create a copy first
         .sort((a, b) => a.sequence - b.sequence) // Sort by sequence
         .map((apiMission) => {
           const status = convertStatus(apiMission.status);
@@ -235,6 +240,7 @@ export default function CurrentMission() {
   }, [missions]);
 
   const handleClick = (mission: Mission | null) => {
+    dispatch(setCurrentMissionReward(mission?.rewardUrl || ""));
     if (mission) {
       router.push(`/${mission.url}`);
     } else {

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Mouse } from "lucide-react";
+import { Mouse, X } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import PdfIntro from "./pdf-intro";
 import PdfQuestions from "./pdf-questions";
@@ -133,6 +133,10 @@ const PdfMission = ({ mission }: StandardMissionComponentProps) => {
     }
   };
 
+  const handleClose = () => {
+    router.push("/dashboard?tab=current-mission");
+  };
+
   useEffect(() => {
     const options = {
       root: containerRef.current,
@@ -205,7 +209,17 @@ const PdfMission = ({ mission }: StandardMissionComponentProps) => {
   }
 
   return (
-    <div className="h-screen  overflow-hidden">
+    <div className="h-screen relative  overflow-hidden">
+      <button
+        onClick={handleClose}
+        className={` fixed  ${
+          activeSection != 1
+            ? "text-white top-5 right-5"
+            : "text-black top-5 left-5"
+        } z-10`}
+      >
+        <X size={32} />
+      </button>
       <AnimatedMissionBadge
         mission={mission.type}
         missionStatus={isMissionComplete ? "complete" : "incomplete"}
