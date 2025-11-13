@@ -22,18 +22,14 @@ const MissionInstruction = ({
     <section className="relative min-h-screen justify-center -my-6 mt-[85px] flex flex-col p-5 mx-auto container ">
       <div className="w-full p-10">
         {/* Mission Name */}
-        <p className="text-gray-600 text-sm mb-2">Why I Woke Up</p>
+        <p className="text-gray-600 text-sm mb-2">{missionName}</p>
 
         {/* Title */}
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Mission Task</h1>
 
         {/* Description */}
         <p className="text-gray-700 text-base leading-relaxed max-w-xl mb-12">
-          Have a look at the infographic / pdf to get a better idea on how to
-          submit your tested concept. Your task today is to schedule time in
-          your diary over the next 6 months to work on this. Please schedule a
-          minimum of 2 hours a month. This mission is your initiation into our
-          curious club. Get ready to innovate, learn and grow
+          {missionInstruction}
         </p>
 
         <div className="flex absolute bottom-28 w-full mx-auto  justify-center items-center ">
