@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { Search, ChevronDown, Check } from "lucide-react";
 import { BaseQuestionProps } from "./types";
 import { useGetUsersQuery } from "@/src/services/employeeManagement";
@@ -35,6 +35,7 @@ export const UserSearchQuestion: React.FC<UserSearchQuestionProps> = ({
   const { data: session } = useSession();
   const [searchQuery, setSearchQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const {
     data: users = [],
     isLoading,
@@ -79,11 +80,31 @@ export const UserSearchQuestion: React.FC<UserSearchQuestionProps> = ({
     }
   };
 
-  // Close dropdown when clicking outside
-  const handleBlur = () => {
-    // Small delay to allow click events to register
-    setTimeout(() => setIsOpen(false), 150);
+  // Handle mousedown on dropdown items to prevent blur
+  const handleItemMouseDown = (e: React.MouseEvent, user: User) => {
+    e.preventDefault(); // Prevent blur event from firing
+    handleUserSelect(user);
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
 
   if (isLoading) {
     return (
@@ -106,7 +127,7 @@ export const UserSearchQuestion: React.FC<UserSearchQuestionProps> = ({
   }
 
   return (
-    <div className="space-y-2 relative">
+    <div className="space-y-2 relative" ref={dropdownRef}>
       <div className="relative">
         <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400 z-10" />
         <input
@@ -119,7 +140,6 @@ export const UserSearchQuestion: React.FC<UserSearchQuestionProps> = ({
           value={searchQuery}
           onChange={handleSearchChange}
           onClick={handleInputClick}
-          onBlur={handleBlur}
           className={`w-full pl-10 pr-10 p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer ${
             disabled ? "bg-gray-100 cursor-not-allowed" : ""
           } ${isAnsweredCorrectly === false ? "border-red-500" : ""}`}
@@ -144,7 +164,7 @@ export const UserSearchQuestion: React.FC<UserSearchQuestionProps> = ({
             filteredUsers.map((user: User) => (
               <div
                 key={user.userId}
-                onClick={() => handleUserSelect(user)}
+                onMouseDown={(e) => handleItemMouseDown(e, user)}
                 className={`p-3 cursor-pointer hover:bg-gray-50 flex items-center justify-between ${
                   user.email === value ? "bg-blue-50 text-blue-700" : ""
                 }`}

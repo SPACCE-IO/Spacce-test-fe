@@ -39,8 +39,8 @@ const MissionBadge = ({ width = 330, height = 330, mission, missionStatus }: Bad
   const BadgeImage = missionStatus === "complete" ? badgeType.complete : badgeType.incomplete
 
   return (
-    <div className="container mx-auto rounded-[5px] flex justify-center items-center">
-      <Image src={BadgeImage || "/placeholder.svg"} width={width} height={height} alt={`${mission} Mission Badge`} />
+    <div className="container mx-auto rounded-[5px] flex justify-center items-center pointer-events-none">
+      <Image src={BadgeImage || "/placeholder.svg"} width={width} height={height} alt={`${mission} Mission Badge`} className="pointer-events-none" />
     </div>
   )
 }

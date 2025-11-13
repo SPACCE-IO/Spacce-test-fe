@@ -238,12 +238,24 @@ const PosterMission = ({ mission }: PosterMissionComponentProps) => {
   return (
     <div className="h-screen relative overflow-hidden">
       <button
-        onClick={handleClose}
-        className={` fixed  ${
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleClose(e);
+        }}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleClose(e);
+        }}
+        className={`fixed z-[9999] pointer-events-auto cursor-pointer hover:opacity-80 transition-opacity bg-transparent border-none p-2 ${
           activeSection != 1
             ? "text-white top-5 right-5"
-            : "text-black top-5 left-5"
-        } z-10`}
+            : "text-black top-4 left-4"
+        }`}
+        type="button"
+        aria-label="Close mission"
+        style={{ zIndex: 9999, pointerEvents: "auto" }}
       >
         <X size={32} />
       </button>

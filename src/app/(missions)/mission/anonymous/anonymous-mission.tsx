@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Mouse, X } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import AnonymousIntro from "./anonymous-intro";
@@ -9,7 +10,6 @@ import AnimatedMissionBadge from "@/src/components/AnimatedMissionBadge";
 import StartSection from "@/src/components/start-section";
 import MissionInstruction from "@/src/components/mission/MissionInstruction";
 import TaskPaginationSection from "@/src/components/mission/TaskPaginationSection";
-import router from "next/router";
 // Define interfaces based on your API response
 interface MissionDocument {
   name: string;
@@ -100,8 +100,11 @@ const AnonymousMission = ({ mission }: AnonymousMissionComponentProps) => {
   const section3Ref = useRef<HTMLDivElement>(null!);
   const section4Ref = useRef<HTMLDivElement>(null!);
   const section5Ref = useRef<HTMLDivElement>(null!);
+  const router = useRouter();
 
-  const handleClose = () => {
+  const handleClose = (e?: React.MouseEvent) => {
+    e?.preventDefault();
+    e?.stopPropagation();
     router.push("/dashboard?tab=current-mission");
   };
   // Check if mission is complete based on status
@@ -196,12 +199,24 @@ const AnonymousMission = ({ mission }: AnonymousMissionComponentProps) => {
   return (
     <div className="h-screen relative overflow-hidden">
       <button
-        onClick={handleClose}
-        className={` fixed  ${
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleClose(e);
+        }}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleClose(e);
+        }}
+        className={`fixed z-[9999] pointer-events-auto cursor-pointer hover:opacity-80 transition-opacity bg-transparent border-none p-2 ${
           activeSection != 1
             ? "text-white top-5 right-5"
-            : "text-black top-5 left-5"
-        } z-10`}
+            : "text-black top-4 left-4"
+        }`}
+        type="button"
+        aria-label="Close mission"
+        style={{ zIndex: 9999, pointerEvents: "auto" }}
       >
         <X size={32} />
       </button>
