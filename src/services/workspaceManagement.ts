@@ -23,7 +23,10 @@ export const workspaceManagementApi = apiSlice.injectEndpoints({
         },
         formData: true,
       }),
-      invalidatesTags: ["workspaces", "workspaceById"],
+      invalidatesTags: (result, error, { id }) => [
+        "workspaces",
+        { type: "workspaceById", id },
+      ],
     }),
     getWorkspace: builder.query({
       query: (authToken) => ({
@@ -43,7 +46,7 @@ export const workspaceManagementApi = apiSlice.injectEndpoints({
           Authorization: authToken,
         },
       }),
-      providesTags: ["workspaceById"],
+      providesTags: (result, error, { id }) => [{ type: "workspaceById", id }],
     }),
     getWorkspaceGroups: builder.query({
       query: ({ id, authToken }) => ({
@@ -51,7 +54,10 @@ export const workspaceManagementApi = apiSlice.injectEndpoints({
         method: "GET",
         headers: { Authorization: authToken },
       }),
-      providesTags: ["workspaceGroups"],
+      providesTags: (result, error, { id }) => [
+        { type: "workspaceGroups", id },
+        { type: "workspaceById", id },
+      ],
     }),
     getWorkspaceMissions: builder.query({
       query: ({ id, authToken }) => ({
@@ -59,7 +65,11 @@ export const workspaceManagementApi = apiSlice.injectEndpoints({
         method: "GET",
         headers: { Authorization: authToken },
       }),
-      providesTags: ["workspaceMissions", "workspacePhases"],
+      providesTags: (result, error, { id }) => [
+        { type: "workspaceMissions", id },
+        { type: "workspacePhases", id },
+        { type: "workspaceById", id },
+      ],
     }),
     getWorkspacePhases: builder.query({
       query: ({ id, authToken }) => ({
@@ -67,7 +77,10 @@ export const workspaceManagementApi = apiSlice.injectEndpoints({
         method: "GET",
         headers: { Authorization: authToken },
       }),
-      providesTags: ["workspacePhases"],
+      providesTags: (result, error, { id }) => [
+        { type: "workspacePhases", id },
+        { type: "workspaceById", id },
+      ],
     }),
     getWorkspaceDepartments: builder.query({
       query: ({ id, authToken }) => ({
@@ -75,7 +88,10 @@ export const workspaceManagementApi = apiSlice.injectEndpoints({
         method: "GET",
         headers: { Authorization: authToken },
       }),
-      providesTags: ["workspaceDepartments"],
+      providesTags: (result, error, { id }) => [
+        { type: "workspaceDepartments", id },
+        { type: "workspaceById", id },
+      ],
     }),
   }),
 });

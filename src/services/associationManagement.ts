@@ -11,7 +11,7 @@ export const associationApi = apiSlice.injectEndpoints({
         method: "GET",
         headers: { Authorization: authToken },
       }),
-      providesTags: ["groupById"],
+      providesTags: (result, error, { id }) => [{ type: "groupById", id }],
     }),
     addGroup: builder.mutation({
       query: ({ body, authToken }) => {
@@ -35,7 +35,10 @@ export const associationApi = apiSlice.injectEndpoints({
         headers: { Authorization: authToken },
         formData: true,
       }),
-      invalidatesTags: ["workspaceGroups", "groupById"],
+      invalidatesTags: (result, error, { id }) => [
+        "workspaceGroups",
+        { type: "groupById", id },
+      ],
     }),
     addPhase: builder.mutation({
       query: ({ authToken, body }) => ({
@@ -57,7 +60,10 @@ export const associationApi = apiSlice.injectEndpoints({
         headers: { Authorization: authToken },
         formData: true,
       }),
-      invalidatesTags: ["workspacePhases", "phaseById"],
+      invalidatesTags: (result, error, { id }) => [
+        "workspacePhases",
+        { type: "phaseById", id },
+      ],
     }),
     getPhaseById: builder.query({
       query: ({ id, authToken }) => ({
@@ -65,7 +71,7 @@ export const associationApi = apiSlice.injectEndpoints({
         method: "GET",
         headers: { Authorization: authToken },
       }),
-      providesTags: ["phaseById"],
+      providesTags: (result, error, { id }) => [{ type: "phaseById", id }],
     }),
     addDepartment: builder.mutation({
       query: ({ body, authToken }) => ({
@@ -85,7 +91,10 @@ export const associationApi = apiSlice.injectEndpoints({
         headers: { Authorization: authToken },
         formData: true,
       }),
-      invalidatesTags: ["workspaceDepartments", "departmentById"],
+      invalidatesTags: (result, error, { id }) => [
+        "workspaceDepartments",
+        { type: "departmentById", id },
+      ],
     }),
     getDepartmentById: builder.query({
       query: ({ authToken, id }) => ({
@@ -93,7 +102,7 @@ export const associationApi = apiSlice.injectEndpoints({
         method: "GET",
         headers: { Authorization: authToken },
       }),
-      providesTags: ["departmentById"],
+      providesTags: (result, error, { id }) => [{ type: "departmentById", id }],
     }),
     addMissionToPhase: builder.mutation({
       query: ({ body, authToken, id }) => ({
@@ -102,7 +111,10 @@ export const associationApi = apiSlice.injectEndpoints({
         body,
         headers: { Authorization: authToken },
       }),
-      invalidatesTags: ["workspacePhases", "phaseById"],
+      invalidatesTags: (result, error, { id }) => [
+        "workspacePhases",
+        { type: "phaseById", id },
+      ],
     }),
     addUserToGroup: builder.mutation({
       query: ({ body, authToken, id }) => ({
@@ -111,7 +123,10 @@ export const associationApi = apiSlice.injectEndpoints({
         body,
         headers: { Authorization: authToken },
       }),
-      invalidatesTags: ["workspaceGroups", "groupById"],
+      invalidatesTags: (result, error, { id }) => [
+        "workspaceGroups",
+        { type: "groupById", id },
+      ],
     }),
     addDepartmentToGroup: builder.mutation({
       query: ({ body, authToken, id }) => ({
@@ -120,7 +135,10 @@ export const associationApi = apiSlice.injectEndpoints({
         body,
         headers: { Authorization: authToken },
       }),
-      invalidatesTags: ["workspaceGroups", "groupById"],
+      invalidatesTags: (result, error, { id }) => [
+        "workspaceGroups",
+        { type: "groupById", id },
+      ],
     }),
     addPhaseToDepartment: builder.mutation({
       query: ({ body, authToken, id }) => ({
@@ -129,7 +147,10 @@ export const associationApi = apiSlice.injectEndpoints({
         body,
         headers: { Authorization: authToken },
       }),
-      invalidatesTags: ["workspaceDepartments", "departmentById"],
+      invalidatesTags: (result, error, { id }) => [
+        "workspaceDepartments",
+        { type: "departmentById", id },
+      ],
     }),
   }),
 });

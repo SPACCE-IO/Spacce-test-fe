@@ -408,6 +408,9 @@ export default function CurrentMission() {
                 {/* Show reward image if available, otherwise show badge */}
                 {selectedMission.rewardUrl && (
                   <img
+                    // src={
+                    //   "https://storage.googleapis.com/sapcce/opeso/workspace/1/mission/7/Component%206.svg?GoogleAccessId=sotragebucket%40nifty-atlas-463819-h8.iam.gserviceaccount.com&Expires=4917411963&Signature=AH1y4PsVCmQlIcqOfV%2BKn%2FSFUcLYcbHYqZA%2BXdR9McQXioMfGK4gWUOgFzH9tzqF1ti5NABOoXKhmTrDsFoG96PuZFZOyqisl23pNd3f3Ufed3JPX42bLx9FMwum1%2BuHO8bitCxtu41xX0QZzOC3BQWAoFIK8GLTxEf3mlQ5dhp5s4TTMcv8HR%2BP3PUBrtwi%2BmujjXL5s%2BCVTHfI3lqYyPPkq1gEUGOptm3OcOqbcXdMhCMmcXqPQ7MqnAoJ9BziwULgBCD7voTl7LJkDQQ%2FUFAxUvmzGv2Br9r8LshahqPK22wnrSgxqswgwYn%2BwWz2XTCraDPIuY8j2jP1pBepjQ%3D%3D"
+                    // }
                     src={selectedMission.rewardUrl}
                     alt={`Reward for ${selectedMission.title}`}
                     height={400}

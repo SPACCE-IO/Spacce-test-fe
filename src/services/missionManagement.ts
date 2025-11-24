@@ -16,6 +16,7 @@ export const authApi = apiSlice.injectEndpoints({
         },
         formData: true,
       }),
+      invalidatesTags: ["globalMissions", "dashboard"],
     }),
     getGlobalMission: builder.query({
       query: (authToken) => ({
@@ -23,6 +24,7 @@ export const authApi = apiSlice.injectEndpoints({
         method: "GET",
         headers: { Authorization: authToken },
       }),
+      providesTags: ["globalMissions"],
     }),
     getGlobalMissionById: builder.query({
       query: ({ authToken, id }) => ({
@@ -30,6 +32,10 @@ export const authApi = apiSlice.injectEndpoints({
         method: "GET",
         headers: { Authorization: authToken },
       }),
+      providesTags: (result, error, { id }) => [
+        { type: "globalMissionById", id },
+        "globalMissions",
+      ],
     }),
     addMission: builder.mutation({
       query: ({ body, authToken }) => ({
@@ -41,6 +47,7 @@ export const authApi = apiSlice.injectEndpoints({
         },
         formData: true,
       }),
+      invalidatesTags: ["workspaceMissions", "missionById", "dashboard"],
     }),
     updateMission: builder.mutation({
       query: ({ body, id, authToken }) => ({
@@ -49,6 +56,11 @@ export const authApi = apiSlice.injectEndpoints({
         body,
         headers: { Authorization: authToken },
       }),
+      invalidatesTags: (result, error, { id }) => [
+        "workspaceMissions",
+        { type: "missionById", id },
+        "dashboard",
+      ],
     }),
     getMissionById: builder.query({
       query: ({ id, authToken }) => ({
@@ -56,6 +68,10 @@ export const authApi = apiSlice.injectEndpoints({
         method: "GET",
         headers: { Authorization: authToken },
       }),
+      providesTags: (result, error, { id }) => [
+        { type: "missionById", id },
+        "workspaceMissions",
+      ],
     }),
     getMissionSummary: builder.query({
       query: (authToken) => ({
@@ -63,6 +79,7 @@ export const authApi = apiSlice.injectEndpoints({
         method: "GET",
         headers: { Authorization: authToken },
       }),
+      providesTags: ["workspaceMissions"],
     }),
     getTagByType: builder.query({
       query: ({ body, type, authToken }) => ({
@@ -71,6 +88,7 @@ export const authApi = apiSlice.injectEndpoints({
         body,
         headers: { Authorization: authToken },
       }),
+      providesTags: ["dashboard"],
     }),
     cloneMission: builder.mutation({
       query: ({ body, id, authToken }) => ({
@@ -79,6 +97,7 @@ export const authApi = apiSlice.injectEndpoints({
         body,
         headers: { Authorization: authToken },
       }),
+      invalidatesTags: ["workspaceMissions", "dashboard"],
     }),
     importGlobalMission: builder.mutation({
       query: ({ authToken, body }) => ({
@@ -87,6 +106,7 @@ export const authApi = apiSlice.injectEndpoints({
         body,
         headers: { Authorization: authToken },
       }),
+      invalidatesTags: ["globalMissions", "dashboard"],
     }),
     logResponse: builder.mutation({
       query: ({ authToken, body, id }) => ({
@@ -95,6 +115,11 @@ export const authApi = apiSlice.injectEndpoints({
         body,
         headers: { Authorization: authToken },
       }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "missionById", id },
+        "workspaceMissions",
+        "dashboard",
+      ],
     }),
   }),
 });

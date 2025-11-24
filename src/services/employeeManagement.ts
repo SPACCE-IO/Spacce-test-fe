@@ -34,7 +34,10 @@ export const employeeApi = apiSlice.injectEndpoints({
         body,
         headers: { Authorization: authToken },
       }),
-      invalidatesTags: ["employees", "employeeById"],
+      invalidatesTags: (result, error, { userName }) => [
+        "employees",
+        { type: "employeeById", id: userName },
+      ],
     }),
     getUsers: builder.query({
       query: (authToken) => ({
@@ -52,7 +55,9 @@ export const employeeApi = apiSlice.injectEndpoints({
         method: "GET",
         headers: { Authorization: authToken },
       }),
-      providesTags: ["employeeById"],
+      providesTags: (result, error, { userName }) => [
+        { type: "employeeById", id: userName },
+      ],
     }),
     activateUser: builder.mutation({
       query: ({ body, userName, authToken }) => ({
@@ -61,7 +66,10 @@ export const employeeApi = apiSlice.injectEndpoints({
         body,
         headers: { Authorization: authToken },
       }),
-      invalidatesTags: ["employees", "employeeById"],
+      invalidatesTags: (result, error, { userName }) => [
+        "employees",
+        { type: "employeeById", id: userName },
+      ],
     }),
   }),
 });

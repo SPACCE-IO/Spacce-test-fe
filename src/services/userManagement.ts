@@ -13,6 +13,7 @@ export const userManagementApi = apiSlice.injectEndpoints({
         body: data,
         headers: { Authorization: authToken },
       }),
+      invalidatesTags: ["profile"],
     }),
     setNewPassword: builder.mutation({
       query: ({ body, authToken }) => ({
@@ -21,6 +22,7 @@ export const userManagementApi = apiSlice.injectEndpoints({
         body,
         headers: { Authorization: authToken },
       }),
+      invalidatesTags: ["profile"],
     }),
     getProfile: builder.query({
       query: (authToken) => ({
@@ -30,6 +32,7 @@ export const userManagementApi = apiSlice.injectEndpoints({
           Authorization: authToken,
         },
       }),
+      providesTags: ["profile"],
     }),
     updateProfile: builder.mutation({
       query: ({ body, authToken }) => ({
@@ -41,6 +44,7 @@ export const userManagementApi = apiSlice.injectEndpoints({
         },
         formData: true,
       }),
+      invalidatesTags: ["profile"],
     }),
     getDashboard: builder.query({
       query: (authToken) => ({
@@ -50,6 +54,7 @@ export const userManagementApi = apiSlice.injectEndpoints({
           Authorization: authToken,
         },
       }),
+      providesTags: ["dashboard"],
     }),
     getPage: builder.query({
       query: ({ userName, authToken }) => ({

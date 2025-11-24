@@ -26,7 +26,7 @@ interface QueryResult {
 
 // Base query setup
 const baseQuery = fetchBaseQuery({
-  baseUrl: '',
+  baseUrl: "",
   prepareHeaders: (headers) => {
     return headers;
   },
@@ -40,8 +40,7 @@ const baseQueryWithStandardizedErrors = async (
   const result = (await baseQuery(args, api, extraOptions)) as QueryResult;
 
   if (result.error) {
-  
-    if(result.error.status === 401){
+    if (result.error.status === 401) {
       signOut({ redirect: true, redirectTo: "/login" });
     }
     return {
@@ -57,7 +56,6 @@ const baseQueryWithStandardizedErrors = async (
 
   const data = result.data as ApiResponse;
   if (data?.error || (data?.statusCode && data?.statusCode >= 400)) {
-     
     return {
       error: {
         status: data?.statusCode || 400,
@@ -92,6 +90,9 @@ export const apiSlice = createApi({
     "workspacePhases",
     "workspaceDepartments",
     "workspaceGroups",
+    "dashboard",
+    "identity",
+    "profile",
   ],
   endpoints: (builder) => ({}),
 });

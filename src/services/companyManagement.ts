@@ -10,6 +10,7 @@ export const companyApi = apiSlice.injectEndpoints({
         body,
         headers: { Authorization: authToken },
       }),
+      invalidatesTags: ["companies"],
     }),
     updateCompany: builder.mutation({
       query: ({ body, authToken, orgCode }) => ({
@@ -20,6 +21,10 @@ export const companyApi = apiSlice.injectEndpoints({
           Authorization: authToken,
         },
       }),
+      invalidatesTags: (result, error, { orgCode }) => [
+        "companies",
+        { type: "companyById", id: orgCode },
+      ],
     }),
     getCompanies: builder.query({
       query: (authToken) => ({
@@ -27,6 +32,7 @@ export const companyApi = apiSlice.injectEndpoints({
         method: "GET",
         headers: { Authorization: authToken },
       }),
+      providesTags: ["companies"],
     }),
     getCompanyById: builder.query({
       query: ({ authToken, userId }) => ({
@@ -36,6 +42,9 @@ export const companyApi = apiSlice.injectEndpoints({
           Authorization: authToken,
         },
       }),
+      providesTags: (result, error, { userId }) => [
+        { type: "companyById", id: userId },
+      ],
     }),
     addIdentity: builder.mutation({
       query: ({ body, authToken, id }) => ({
@@ -45,7 +54,10 @@ export const companyApi = apiSlice.injectEndpoints({
         headers: { Authorization: authToken },
         formData: true,
       }),
-      invalidatesTags: ["identity"],
+      invalidatesTags: (result, error, { id }) => [
+        "identity",
+        { type: "companyById", id },
+      ],
     }),
     updateIdentity: builder.mutation({
       query: ({ body, id, authToken }) => ({
@@ -55,7 +67,10 @@ export const companyApi = apiSlice.injectEndpoints({
         headers: { Authorization: authToken },
         formData: true,
       }),
-      invalidatesTags: ["identity"],
+      invalidatesTags: (result, error, { id }) => [
+        "identity",
+        { type: "companyById", id },
+      ],
     }),
     addLanguage: builder.mutation({
       query: ({ body, authToken, orgCode }) => ({
@@ -64,7 +79,10 @@ export const companyApi = apiSlice.injectEndpoints({
         body,
         headers: { Authorization: authToken },
       }),
-      invalidatesTags: ["identity"],
+      invalidatesTags: (result, error, { orgCode }) => [
+        "identity",
+        { type: "companyById", id: orgCode },
+      ],
     }),
     getLanguages: builder.query({
       query: ({ authToken, orgCode }) => ({
@@ -80,7 +98,10 @@ export const companyApi = apiSlice.injectEndpoints({
         method: "GET",
         headers: { Authorization: authToken },
       }),
-      providesTags: ["identity"],
+      providesTags: (result, error, { id }) => [
+        "identity",
+        { type: "companyById", id },
+      ],
     }),
     updateLanguage: builder.mutation({
       query: ({ body, authToken, id }) => ({
@@ -89,8 +110,8 @@ export const companyApi = apiSlice.injectEndpoints({
         body,
         headers: { Authorization: authToken },
       }),
+      invalidatesTags: ["identity"],
     }),
-    invalidatesTags: ["identity"],
   }),
 });
 
